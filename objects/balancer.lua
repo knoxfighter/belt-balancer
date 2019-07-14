@@ -9,7 +9,7 @@ require("helper/conversion")
 ---@param entity LuaEntity the newly placed splitter
 ---@return number[] unique list of found balancers (only indices)
 function find_nearby_balancer(entity)
-    local found_splitters = entity.surface.find_entities_filtered{
+    local found_splitters = entity.surface.find_entities_filtered {
         position = entity.position,
         name = "belt-balancer",
         radius = 1,
@@ -41,7 +41,7 @@ function find_input_output_belts(splitter)
     local input_belts = {}
     local output_belts = {}
 
-    local found_belts = splitter.surface.find_entities_filtered{
+    local found_belts = splitter.surface.find_entities_filtered {
         position = splitter_pos,
         type = "transport-belt",
         radius = 1
@@ -81,17 +81,17 @@ function get_input_output_pos(belt, direction)
     direction = direction or belt.direction
 
     if direction == defines.direction.north then
-        into_pos = {x = belt_pos.x, y = belt_pos.y - 1}
-        from_pos = {x = belt_pos.x, y = belt_pos.y + 1}
+        into_pos = { x = belt_pos.x, y = belt_pos.y - 1 }
+        from_pos = { x = belt_pos.x, y = belt_pos.y + 1 }
     elseif direction == defines.direction.south then
-        into_pos = {x = belt_pos.x, y = belt_pos.y + 1}
-        from_pos = {x = belt_pos.x, y = belt_pos.y - 1}
+        into_pos = { x = belt_pos.x, y = belt_pos.y + 1 }
+        from_pos = { x = belt_pos.x, y = belt_pos.y - 1 }
     elseif direction == defines.direction.west then
-        into_pos = {x = belt_pos.x - 1, y = belt_pos.y}
-        from_pos = {x = belt_pos.x + 1, y = belt_pos.y}
+        into_pos = { x = belt_pos.x - 1, y = belt_pos.y }
+        from_pos = { x = belt_pos.x + 1, y = belt_pos.y }
     elseif direction == defines.direction.east then
-        into_pos = {x = belt_pos.x + 1, y = belt_pos.y}
-        from_pos = {x = belt_pos.x - 1, y = belt_pos.y}
+        into_pos = { x = belt_pos.x + 1, y = belt_pos.y }
+        from_pos = { x = belt_pos.x - 1, y = belt_pos.y }
     end
 
     return into_pos, from_pos
@@ -106,7 +106,7 @@ function get_input_output_balancer_index(belt, direction)
     local into_pos, from_pos = get_input_output_pos(belt, direction)
     local into_balancer, from_balancer
 
-    local into_splitter = belt.surface.find_entities_filtered{
+    local into_splitter = belt.surface.find_entities_filtered {
         position = into_pos,
         name = "belt-balancer",
     }
@@ -114,7 +114,7 @@ function get_input_output_balancer_index(belt, direction)
         into_balancer = find_belonging_balancer(splitter, direction)
     end
 
-    local from_splitter = belt.surface.find_entities_filtered{
+    local from_splitter = belt.surface.find_entities_filtered {
         position = from_pos,
         name = "belt-balancer"
     }
@@ -156,8 +156,6 @@ function new_balancer(splitter)
     ---@type SimpleItemStack[]
     new_balancer.buffer = {}
 
-    -- run only on nth_tick
-    new_balancer.tick_count = 1
     new_balancer.nth_tick = 999
 
     if type(splitter) == "table" and splitter.name == "belt-balancer" then
@@ -224,11 +222,7 @@ function balancer_add_belt(balancer_id, belt, input)
     end
 
     -- update nth_tick
-    local ticks_per_tile = 0.25 / belt.prototype.belt_speed
-    local nth_tick = math.ceil(ticks_per_tile)
-    if balancer.nth_tick > nth_tick then
-        balancer.nth_tick = nth_tick
-    end
+    balancer_recalculate_nth_tick(balancer_id, belt.prototype.speed)
 end
 
 ---balancer_remove_belt
@@ -253,7 +247,7 @@ function balancer_remove_belt(balancer_id, belt, input)
         end
     end
 
-    -- TODO recalculate nth_tick
+    balancer_recalculate_nth_tick(balancer_id)
 end
 
 ---balancer_merge_balancer
@@ -281,6 +275,35 @@ function balancer_merge_balancer(balancer_id, other_balancer_id)
     end
 
     global.new_balancers[other_balancer_id] = nil
+
+    unregister_on_tick(other_balancer_id)
+    balancer_recalculate_nth_tick(balancer_id)
+end
+
+function balancer_recalculate_nth_tick(balancer_id, fastest_belt_speed)
+    local balancer = global.new_balancers[balancer_id]
+
+    -- recalculate nth_tick
+    -- find fastest belt
+    if not fastest_belt_speed then
+        for _, belt in pairs(balancer.input_belts) do
+            local belt_speed = belt.prototype.belt_speed
+            if not fastest_belt_speed or belt_speed > fastest_belt_speed then
+                fastest_belt_speed = belt_speed
+            end
+        end
+    end
+
+    -- remove current handler
+    if fastest_belt_speed then
+        local ticks_per_tile = 0.25 / fastest_belt_speed
+        local nth_tick = math.ceil(ticks_per_tile)
+        if balancer.nth_tick > nth_tick then
+            unregister_on_tick(balancer_id)
+            register_on_tick(nth_tick, balancer_id)
+            balancer.nth_tick = nth_tick
+        end
+    end
 end
 
 ---balancer_has_splitter
@@ -316,65 +339,59 @@ end
 function balancer_on_tick(balancer_id)
     local balancer = global.new_balancers[balancer_id]
 
-    if balancer.tick_count < balancer.nth_tick then
-        balancer.tick_count = balancer.tick_count + 1
-    else
-        balancer.tick_count = 1
+    if #balancer.input_lanes > 0 and #balancer.output_lanes > 0 then
+        local last_one_failed = 0
 
-        if #balancer.input_lanes > 0 and #balancer.output_lanes > 0 then
-            local last_one_failed = 0
+        -- get how many items are needed per lane
+        local buffer_count = #balancer.buffer
+        local output_lane_count = #balancer.output_lanes
+        local gather_amount = output_lane_count - buffer_count
 
-            -- get how many items are needed per lane
-            local buffer_count = #balancer.buffer
-            local output_lane_count = #balancer.output_lanes
-            local gather_amount = output_lane_count - buffer_count
+        -- INPUT
+        while gather_amount > 0 do
+            if last_one_failed == balancer.current_input_lane then
+                break
+            end
 
-            -- INPUT
-            while gather_amount > 0 do
-                if last_one_failed == balancer.current_input_lane then
-                    break
-                end
-
-                if balancer.input_lanes[balancer.current_input_lane] then
-                    local lane = balancer.input_lanes[balancer.current_input_lane]
-                    if #lane > 0 then
-                        -- remove item from lane and add to buffer
-                        local lua_item = lane[1]
-                        local simple_item = convert_LuaItemStack_to_SimpleItemStack(lua_item)
-                        lane.remove_item(lua_item)
-                        table.insert(balancer.buffer, simple_item)
-                        gather_amount = gather_amount - 1
-                        last_one_failed = 0
-                    else
-                        if last_one_failed == 0 then
-                            last_one_failed = balancer.current_input_lane
-                        end
-                    end
+            if balancer.input_lanes[balancer.current_input_lane] then
+                local lane = balancer.input_lanes[balancer.current_input_lane]
+                if #lane > 0 then
+                    -- remove item from lane and add to buffer
+                    local lua_item = lane[1]
+                    local simple_item = convert_LuaItemStack_to_SimpleItemStack(lua_item)
+                    lane.remove_item(lua_item)
+                    table.insert(balancer.buffer, simple_item)
+                    gather_amount = gather_amount - 1
+                    last_one_failed = 0
                 else
                     if last_one_failed == 0 then
                         last_one_failed = balancer.current_input_lane
                     end
                 end
-
-                balancer.current_input_lane = balancer.current_input_lane + 1
-                balancer.current_input_lane = ((balancer.current_input_lane - 1) % #balancer.input_lanes) + 1
+            else
+                if last_one_failed == 0 then
+                    last_one_failed = balancer.current_input_lane
+                end
             end
 
-            -- OUTPUT
-            for i = 1, #balancer.output_lanes do
-                if #balancer.buffer > 0 then
-                    local lane = balancer.output_lanes[balancer.current_output_lane]
-                    if lane and lane.valid and lane.can_insert_at_back() then
-                        if lane.insert_at_back(balancer.buffer[1]) then
-                            table.remove(balancer.buffer, 1)
-                        end
-                    end
+            balancer.current_input_lane = balancer.current_input_lane + 1
+            balancer.current_input_lane = ((balancer.current_input_lane - 1) % #balancer.input_lanes) + 1
+        end
 
-                    balancer.current_output_lane = balancer.current_output_lane + 1
-                    balancer.current_output_lane = ((balancer.current_output_lane - 1) % #balancer.output_lanes) + 1
-                else
-                    break
+        -- OUTPUT
+        for i = 1, #balancer.output_lanes do
+            if #balancer.buffer > 0 then
+                local lane = balancer.output_lanes[balancer.current_output_lane]
+                if lane and lane.valid and lane.can_insert_at_back() then
+                    if lane.insert_at_back(balancer.buffer[1]) then
+                        table.remove(balancer.buffer, 1)
+                    end
                 end
+
+                balancer.current_output_lane = balancer.current_output_lane + 1
+                balancer.current_output_lane = ((balancer.current_output_lane - 1) % #balancer.output_lanes) + 1
+            else
+                break
             end
         end
     end

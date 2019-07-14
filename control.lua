@@ -1,8 +1,5 @@
+require("helper/message-handler")
 require("objects/balancer")
-
--- list of all balancers (instance of Balancer_Class)
----@type Balancer_Class[]
---global.balancers = {}
 
 script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity},
     function(e)
@@ -60,6 +57,7 @@ script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_e
             balancer_remove_splitter(balancer_index, removed_splitter)
             if not balancer_is_valid(balancer_index) then
                 global.new_balancers[balancer_index] = nil
+                unregister_on_tick(balancer_index)
                 return
             end
 
@@ -70,6 +68,7 @@ script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_e
                     new_balancer(splitter_group)
                 end
                 global.new_balancers[balancer_index] = nil
+                unregister_on_tick(balancer_index)
             end
         end
 
@@ -113,53 +112,12 @@ script.on_event({defines.events.on_player_rotated_entity},
     end
 )
 
-script.on_event(defines.events.on_tick,
-    function()
-        -- complete logic of the balancer!
-        for _, balancer in pairs(global.new_balancers) do
-            balancer_on_tick(balancer.index)
-        end
-
-        -- TODO dont run it on tick, but on nth-tick
-    end
-)
-
-script.on_event(defines.events.on_gui_closed,
-    function(e)
-    end
-)
-
-script.on_event(defines.events.on_gui_click,
-    function(e)
-
-    end
-)
-
-script.on_event(defines.events.on_gui_text_changed,
-    function(e)
-
-    end
-)
-
-script.on_event(defines.events.on_player_display_resolution_changed,
-    function(e)
-    end
-)
-
-script.on_event(defines.events.on_entity_renamed,
-    function(e)
-
-    end
-)
-
 -- on new savegame and on adding mod to existing save
 script.on_init(function()
     global.belt_balancer_max_id = 0
 
-    ---@type Balancer_Class[]
-    global.balancers = {}
-
     global.new_balancers = {}
+    global.events = {}
 end)
 
 -- If some mod is changed, so train-stops are not valid anymore ... also reload
