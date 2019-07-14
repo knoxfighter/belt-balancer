@@ -103,7 +103,7 @@ end
 ---@param direction defines.direction override the direction of the belt.
 ---@return number,number into_balancer, from_balancer
 function get_input_output_balancer_index(belt, direction)
-    local into_pos, from_pos = get_input_output_pos(belt)
+    local into_pos, from_pos = get_input_output_pos(belt, direction)
     local into_balancer, from_balancer
 
     local into_splitter = belt.surface.find_entities_filtered{
