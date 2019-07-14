@@ -27,7 +27,7 @@ data:extend {
                 height = 200,
                 frame_count = 16,
                 line_length = 8,
-                scale = 0.27,
+                scale = 0.25,
 				animation_speed = 0.15,
                 shift = util.by_pixel(0, -1)
             }
