@@ -4,7 +4,7 @@ data:extend {
     {
         type = "simple-entity-with-force",
         name = "belt-balancer",
-        icon = "__base__/graphics/icons/splitter.png",
+        icon = "__belt-balancer__/graphics/icons/balancer.png",
         icon_size = 32,
         flags = { "placeable-neutral", "player-creation" },
         minable = { mining_time = 0.1, result = "belt-balancer" },
@@ -21,14 +21,15 @@ data:extend {
         render_layer = "object",
         animations = {
             {
-                filename = "__belt-balancer__/graphics/compound-splitter-lane.png",
+                filename = "__belt-balancer__/graphics/entities/balancer.png",
                 priority = "high",
                 width = 200,
                 height = 200,
-                frame_count = 32,
+                frame_count = 16,
                 line_length = 8,
-                scale = 0.6,
-                --shift = util.by_pixel(0, -0.5)
+                scale = 0.27,
+				animation_speed = 0.15,
+                shift = util.by_pixel(0, -1)
             }
         },
         --pictures = {
@@ -43,8 +44,8 @@ data:extend {
     {
         type = "item",
         name = "belt-balancer",
-        icon = "__base__/graphics/icons/splitter.png",
-        icon_size = 32,
+        icon = "__belt-balancer__/graphics/icons/balancer.png",
+        icon_size = 200,
         subgroup = "belt",
         order = "c[splitter]-a[splitter]",
         place_result = "belt-balancer",
