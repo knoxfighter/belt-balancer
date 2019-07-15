@@ -21,6 +21,7 @@ function unregister_on_tick(balancer_id)
             if #global.events[tick] == 0 then
                 -- unregister this tick
                 script.on_nth_tick(tick, nil)
+                global.events[tick] = nil
             end
         end
     end
@@ -29,5 +30,12 @@ end
 function on_tick(e)
     for _, balancer_id in pairs(global.events[e.nth_tick]) do
         balancer_on_tick(balancer_id)
+    end
+end
+
+function reregister_on_tick()
+    -- reregister balancer
+    for tick, _ in pairs(global.events) do
+        script.on_nth_tick(tick, on_tick)
     end
 end

@@ -122,3 +122,5 @@ end)
 
 -- If some mod is changed, so train-stops are not valid anymore ... also reload
 --script.on_configuration_changed()
+
+script.on_load(reregister_on_tick)
