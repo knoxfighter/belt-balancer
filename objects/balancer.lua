@@ -283,10 +283,21 @@ end
 function balancer_recalculate_nth_tick(balancer_id, fastest_belt_speed)
     local balancer = global.new_balancers[balancer_id]
 
+    if table_size(balancer.input_belts) == 0 or table_size(balancer.output_belts) == 0 then
+        unregister_on_tick(balancer_id)
+        return
+    end
+
     -- recalculate nth_tick
     -- find fastest belt
     if not fastest_belt_speed then
         for _, belt in pairs(balancer.input_belts) do
+            local belt_speed = belt.prototype.belt_speed
+            if not fastest_belt_speed or belt_speed > fastest_belt_speed then
+                fastest_belt_speed = belt_speed
+            end
+        end
+        for _, belt in pairs(balancer.output_belts) do
             local belt_speed = belt.prototype.belt_speed
             if not fastest_belt_speed or belt_speed > fastest_belt_speed then
                 fastest_belt_speed = belt_speed
