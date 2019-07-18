@@ -1,5 +1,6 @@
 require("helper/table")
 require("helper/conversion")
+require("helper/math")
 
 ---find_nearby_balancer
 ---find neaby balancers, by searching on the map for nearby entities
@@ -222,7 +223,7 @@ function balancer_add_belt(balancer_id, belt, input)
     end
 
     -- update nth_tick
-    balancer_recalculate_nth_tick(balancer_id, belt.prototype.speed)
+    balancer_recalculate_nth_tick(balancer_id)
 end
 
 ---balancer_remove_belt
@@ -289,31 +290,39 @@ function balancer_recalculate_nth_tick(balancer_id, fastest_belt_speed)
     end
 
     -- recalculate nth_tick
-    -- find fastest belt
-    if not fastest_belt_speed then
-        for _, belt in pairs(balancer.input_belts) do
-            local belt_speed = belt.prototype.belt_speed
-            if not fastest_belt_speed or belt_speed > fastest_belt_speed then
-                fastest_belt_speed = belt_speed
-            end
-        end
-        for _, belt in pairs(balancer.output_belts) do
-            local belt_speed = belt.prototype.belt_speed
-            if not fastest_belt_speed or belt_speed > fastest_belt_speed then
-                fastest_belt_speed = belt_speed
-            end
+    local tick_list = {}
+
+    for _, belt in pairs(balancer.input_belts) do
+        local belt_speed = belt.prototype.belt_speed
+        local ticks_per_tile = 0.25 / belt_speed
+        local nth_tick = math.ceil(ticks_per_tile)
+        tick_list[nth_tick] = nth_tick
+    end
+
+    for _, belt in pairs(balancer.output_belts) do
+        local belt_speed = belt.prototype.belt_speed
+        local ticks_per_tile = 0.25 / belt_speed
+        local nth_tick = math.ceil(ticks_per_tile)
+        tick_list[nth_tick] = nth_tick
+    end
+
+    local smallest_gcd = -1
+    for _, tick in pairs(tick_list) do
+        if smallest_gcd == -1 then
+            smallest_gcd = tick
+        elseif smallest_gcd == 1 then
+            break
+        elseif smallest_gcd == tick then
+            -- do nothing
+        else
+            smallest_gcd = math.gcd(smallest_gcd, tick)
         end
     end
 
-    -- remove current handler
-    if fastest_belt_speed then
-        local ticks_per_tile = 0.25 / fastest_belt_speed
-        local nth_tick = math.ceil(ticks_per_tile)
-        if balancer.nth_tick > nth_tick then
-            unregister_on_tick(balancer_id)
-            register_on_tick(nth_tick, balancer_id)
-            balancer.nth_tick = nth_tick
-        end
+    if balancer.nth_tick ~= smallest_gcd then
+        balancer.nth_tick = smallest_gcd
+        unregister_on_tick(balancer_id)
+        register_on_tick(smallest_gcd, balancer_id)
     end
 end
 
