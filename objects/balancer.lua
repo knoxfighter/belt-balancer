@@ -281,11 +281,16 @@ function balancer_merge_balancer(balancer_id, other_balancer_id)
     balancer_recalculate_nth_tick(balancer_id)
 end
 
-function balancer_recalculate_nth_tick(balancer_id, fastest_belt_speed)
+---balancer_recalculate_nth_tick
+---Recalculate the tick, when this balancer has to run.
+---It has to be the gcd, cause else, some belts are not compressed
+---@param balancer_id number balancer to perform on
+function balancer_recalculate_nth_tick(balancer_id)
     local balancer = global.new_balancers[balancer_id]
 
     if table_size(balancer.input_belts) == 0 or table_size(balancer.output_belts) == 0 then
         unregister_on_tick(balancer_id)
+        balancer.nth_tick = -1
         return
     end
 
