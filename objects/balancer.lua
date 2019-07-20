@@ -260,19 +260,29 @@ function balancer_merge_balancer(balancer_id, other_balancer_id)
     local other_balancer = global.new_balancers[other_balancer_id]
 
     for _, splitter in pairs(other_balancer.splitter) do
-        balancer.splitter[splitter.unit_number] = splitter
+        if splitter.valid then
+            balancer.splitter[splitter.unit_number] = splitter
+        end
     end
     for key, belt in pairs(other_balancer.input_belts) do
-        balancer.input_belts[key] = belt
+        if belt.valid then
+            balancer.input_belts[key] = belt
+        end
     end
     for key, belt in pairs(other_balancer.output_belts) do
-        balancer.output_belts[key] = belt
+        if belt.valid then
+            balancer.output_belts[key] = belt
+        end
     end
     for _, lane in pairs(other_balancer.input_lanes) do
-        table.insert(balancer.input_lanes, lane)
+        if lane.valid then
+            table.insert(balancer.input_lanes, lane)
+        end
     end
     for _, lane in pairs(other_balancer.output_lanes) do
-        table.insert(balancer.output_lanes, lane)
+        if lane.valid then
+            table.insert(balancer.output_lanes, lane)
+        end
     end
 
     global.new_balancers[other_balancer_id] = nil
@@ -298,17 +308,21 @@ function balancer_recalculate_nth_tick(balancer_id)
     local tick_list = {}
 
     for _, belt in pairs(balancer.input_belts) do
-        local belt_speed = belt.prototype.belt_speed
-        local ticks_per_tile = 0.25 / belt_speed
-        local nth_tick = math.ceil(ticks_per_tile)
-        tick_list[nth_tick] = nth_tick
+        if belt.valid then
+            local belt_speed = belt.prototype.belt_speed
+            local ticks_per_tile = 0.25 / belt_speed
+            local nth_tick = math.ceil(ticks_per_tile)
+            tick_list[nth_tick] = nth_tick
+        end
     end
 
     for _, belt in pairs(balancer.output_belts) do
-        local belt_speed = belt.prototype.belt_speed
-        local ticks_per_tile = 0.25 / belt_speed
-        local nth_tick = math.ceil(ticks_per_tile)
-        tick_list[nth_tick] = nth_tick
+        if belt.valid then
+            local belt_speed = belt.prototype.belt_speed
+            local ticks_per_tile = 0.25 / belt_speed
+            local nth_tick = math.ceil(ticks_per_tile)
+            tick_list[nth_tick] = nth_tick
+        end
     end
 
     local smallest_gcd = -1
@@ -324,7 +338,7 @@ function balancer_recalculate_nth_tick(balancer_id)
         end
     end
 
-    if balancer.nth_tick ~= smallest_gcd then
+    if smallest_gcd ~= -1 and balancer.nth_tick ~= smallest_gcd then
         balancer.nth_tick = smallest_gcd
         unregister_on_tick(balancer_id)
         register_on_tick(smallest_gcd, balancer_id)
@@ -340,7 +354,7 @@ function balancer_has_splitter(balancer_id, splitter)
     local balancer = global.new_balancers[balancer_id]
 
     for _, self_splitter in pairs(balancer.splitter) do
-        if splitter.unit_number == self_splitter.unit_number then
+        if self_splitter.valid and splitter.unit_number == self_splitter.unit_number then
             return true
         end
     end
@@ -378,8 +392,8 @@ function balancer_on_tick(balancer_id)
                 break
             end
 
-            if balancer.input_lanes[balancer.current_input_lane] then
-                local lane = balancer.input_lanes[balancer.current_input_lane]
+            local lane = balancer.input_lanes[balancer.current_input_lane]
+            if lane and lane.valid then
                 if #lane > 0 then
                     -- remove item from lane and add to buffer
                     local lua_item = lane[1]
@@ -397,8 +411,8 @@ function balancer_on_tick(balancer_id)
                 if last_one_failed == 0 then
                     last_one_failed = balancer.current_input_lane
                 end
-            end
 
+            end
             balancer.current_input_lane = balancer.current_input_lane + 1
             balancer.current_input_lane = ((balancer.current_input_lane - 1) % #balancer.input_lanes) + 1
         end
