@@ -71,6 +71,13 @@ script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_e
 
             local linked_splitter = balancer_get_linked(balancer_index)
             if table_size(linked_splitter) > 1 then
+                -- give player buffer items
+                if e.name == defines.events.on_player_mined_entity or e.name == defines.events.on_robot_mined_entity then
+                    for _, item in pairs(global.new_balancers[balancer_index].buffer) do
+                        e.buffer.insert(item)
+                    end
+                end
+
                 -- create multiple new balancers
                 for _, splitter_group in pairs(linked_splitter) do
                     new_balancer(splitter_group)
