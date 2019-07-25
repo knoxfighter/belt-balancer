@@ -56,6 +56,14 @@ script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_e
             local balancer_index = find_belonging_balancer(removed_splitter)
             balancer_remove_splitter(balancer_index, removed_splitter)
             if not balancer_is_valid(balancer_index) then
+                -- give player buffer items
+                if e.name == defines.events.on_player_mined_entity or e.name == defines.events.on_robot_mined_entity then
+                    for _, item in pairs(global.new_balancers[balancer_index].buffer) do
+                        e.buffer.insert(item)
+                    end
+                end
+
+                -- delete balancer
                 global.new_balancers[balancer_index] = nil
                 unregister_on_tick(balancer_index)
                 return

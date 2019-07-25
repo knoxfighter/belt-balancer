@@ -259,11 +259,14 @@ function balancer_merge_balancer(balancer_id, other_balancer_id)
     local balancer = global.new_balancers[balancer_id]
     local other_balancer = global.new_balancers[other_balancer_id]
 
+    -- move splitters
     for _, splitter in pairs(other_balancer.splitter) do
         if splitter.valid then
             balancer.splitter[splitter.unit_number] = splitter
         end
     end
+    
+    -- move belts
     for key, belt in pairs(other_balancer.input_belts) do
         if belt.valid then
             balancer.input_belts[key] = belt
@@ -274,6 +277,8 @@ function balancer_merge_balancer(balancer_id, other_balancer_id)
             balancer.output_belts[key] = belt
         end
     end
+    
+    -- move belts
     for _, lane in pairs(other_balancer.input_lanes) do
         if lane.valid then
             table.insert(balancer.input_lanes, lane)
@@ -283,6 +288,11 @@ function balancer_merge_balancer(balancer_id, other_balancer_id)
         if lane.valid then
             table.insert(balancer.output_lanes, lane)
         end
+    end
+    
+    -- move buffer
+    for _, item in pairs(other_balancer.buffer) do
+        table.insert(balancer.buffer, item)
     end
 
     global.new_balancers[other_balancer_id] = nil
