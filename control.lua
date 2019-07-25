@@ -118,6 +118,19 @@ script.on_init(function()
 
     global.new_balancers = {}
     global.events = {}
+
+    -- Unlock recipes, if technologies already researched
+    for _, force in pairs(game.forces) do
+        if force.technologies["logistics"].researched then
+            force.recipes["belt-balancer-normal-belt"].enabled = true
+        end
+        if force.technologies["logistics-2"].researched then
+            force.recipes["belt-balancer-fast-belt"].enabled = true
+        end
+        if force.technologies["logistics-3"].researched then
+            force.recipes["belt-balancer-express-belt"].enabled = true
+        end
+    end
 end)
 
 -- If some mod is changed, so train-stops are not valid anymore ... also reload

@@ -1,5 +1,3 @@
-require("__base__.prototypes.entity.transport-belt-pictures")
-
 data:extend {
     {
         type = "simple-entity-with-force",
@@ -28,18 +26,10 @@ data:extend {
                 frame_count = 16,
                 line_length = 8,
                 scale = 0.25,
-				animation_speed = 0.15,
+                animation_speed = 0.15,
                 shift = util.by_pixel(0, -1)
             }
         },
-        --pictures = {
-        --    {
-        --        filename = "__belt-balancer__/graphics/compound-splitter-lane.png",
-        --        width = 61,
-        --        height = 50,
-        --        shift = { 0.078125, 0.15625 },
-        --    }
-        --},
     },
     {
         type = "item",
@@ -47,20 +37,55 @@ data:extend {
         icon = "__belt-balancer__/graphics/icons/balancer.png",
         icon_size = 200,
         subgroup = "belt",
-        order = "c[splitter]-a[splitter]",
+        order = "c[splitter]-x[balancer]",
         place_result = "belt-balancer",
         stack_size = 50
     },
     {
         type = "recipe",
-        name = "belt-balancer",
-        enabled = true,
-        energy_required = 1,
+        name = "belt-balancer-normal-belt",
+        enabled = false,
+        energy_required = 3,
         ingredients = {
-            { "electronic-circuit", 5 },
-            { "iron-plate", 5 },
-            { "transport-belt", 4 }
+            { "iron-gear-wheel", 20 },
+            { "electronic-circuit", 15 },
+            { "transport-belt", 5 },
         },
-        result = "belt-balancer"
+        result = "belt-balancer",
+        order = "d[balancer]-a[balancer]"
+    },
+    {
+        type = "recipe",
+        name = "belt-balancer-fast-belt",
+        enabled = false,
+        energy_required = 2.5,
+        ingredients = {
+            { "iron-gear-wheel", 20 },
+            { "electronic-circuit", 15 },
+            { "fast-transport-belt", 5 },
+        },
+        results = {
+            { "belt-balancer", 2 }
+        },
+        order = "d[balancer]-b[balancer]"
+    },
+    {
+        type = "recipe",
+        name = "belt-balancer-express-belt",
+        enabled = false,
+        energy_required = 2,
+        ingredients = {
+            { "iron-gear-wheel", 20 },
+            { "electronic-circuit", 15 },
+            { "express-transport-belt", 5 },
+        },
+        results = {
+            { "belt-balancer", 3 }
+        },
+        order = "d[balancer]-c[balancer]"
     }
 }
+
+table.insert(data.raw.technology["logistics"].effects, { recipe = "belt-balancer-normal-belt", type = "unlock-recipe" })
+table.insert(data.raw.technology["logistics-2"].effects, { recipe = "belt-balancer-fast-belt", type = "unlock-recipe" })
+table.insert(data.raw.technology["logistics-3"].effects, { recipe = "belt-balancer-express-belt", type = "unlock-recipe" })
