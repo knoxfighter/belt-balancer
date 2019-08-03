@@ -456,11 +456,14 @@ function balancer_get_linked(balancer_id)
     -- create matrix
     local matrix = {}
     for _, splitter in pairs(balancer.splitter) do
-        local pos = splitter.position
-        if not matrix[pos.x] then
-            matrix[pos.x] = {}
+        if splitter and splitter.valid then
+            local pos = splitter.position
+            if not matrix[pos.x] then
+                matrix[pos.x] = {}
+            end
+            matrix[pos.x][pos.y] = splitter
+
         end
-        matrix[pos.x][pos.y] = splitter
     end
 
     local curr_num = 0
