@@ -265,7 +265,7 @@ function balancer_merge_balancer(balancer_id, other_balancer_id)
             balancer.splitter[splitter.unit_number] = splitter
         end
     end
-    
+
     -- move belts
     for key, belt in pairs(other_balancer.input_belts) do
         if belt.valid then
@@ -277,7 +277,7 @@ function balancer_merge_balancer(balancer_id, other_balancer_id)
             balancer.output_belts[key] = belt
         end
     end
-    
+
     -- move belts
     for _, lane in pairs(other_balancer.input_lanes) do
         if lane.valid then
@@ -289,7 +289,7 @@ function balancer_merge_balancer(balancer_id, other_balancer_id)
             table.insert(balancer.output_lanes, lane)
         end
     end
-    
+
     -- move buffer
     for _, item in pairs(other_balancer.buffer) do
         table.insert(balancer.buffer, item)

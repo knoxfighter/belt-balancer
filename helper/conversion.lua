@@ -2,7 +2,7 @@
 ---@param lua_item_stack LuaItemStack
 ---@return SimpleItemStack
 function convert_LuaItemStack_to_SimpleItemStack(lua_item_stack)
-    local simple_item =  {
+    local simple_item = {
         name = lua_item_stack.name,
         count = lua_item_stack.count,
         health = lua_item_stack.health,
