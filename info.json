@@ -6,5 +6,5 @@
   "contact": "factorio@asdff45.de",
   "factorio_version": "0.17",
   "dependencies": ["base >= 0.17.46"],
-  "description": "Add splitter that also balancer belts"
+  "description": "Adds Balancer Parts, that can be put together, to balance all adjusting lanes."
 }
