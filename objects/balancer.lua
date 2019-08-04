@@ -417,11 +417,6 @@ function balancer_on_tick(balancer_id)
                         last_one_failed = balancer.current_input_lane
                     end
                 end
-            else
-                if last_one_failed == 0 then
-                    last_one_failed = balancer.current_input_lane
-                end
-
             end
             balancer.current_input_lane = balancer.current_input_lane + 1
             balancer.current_input_lane = ((balancer.current_input_lane - 1) % #balancer.input_lanes) + 1
