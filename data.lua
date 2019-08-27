@@ -3,7 +3,7 @@ data:extend {
         type = "simple-entity-with-force",
         name = "belt-balancer",
         icon = "__belt-balancer__/graphics/icons/balancer.png",
-        icon_size = 32,
+        icon_size = 200,
         flags = { "placeable-neutral", "player-creation" },
         minable = { mining_time = 0.1, result = "belt-balancer" },
         max_health = 170,
