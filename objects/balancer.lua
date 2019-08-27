@@ -36,10 +36,12 @@ end
 ---find_input_output_belts
 ---find input and output belts for this specific splitter
 ---@param splitter LuaEntity the splitter to search from
----@return LuaEntity[],LuaEntity[] found input belts, found output belts
+---@return object[number]{LuaEntity, string},object[number]{LuaEntity, string} find input and output belts. Object is no direct array: object[number index]{ LuaEntity number, string belt_type }
 function find_input_output_belts(splitter)
     local splitter_pos = splitter.position
+    -- input_belts[belt_index] = { belt, belt_type }
     local input_belts = {}
+    -- output_belts[belt_index] = { belt, belt_type }
     local output_belts = {}
 
     local found_belts = splitter.surface.find_entities_filtered {
@@ -50,9 +52,23 @@ function find_input_output_belts(splitter)
     for _, belt in pairs(found_belts) do
         local into_pos, from_pos = get_input_output_pos(belt)
         if into_pos.x == splitter_pos.x and into_pos.y == splitter_pos.y then
-            input_belts[belt.unit_number] = belt
+            input_belts[belt.unit_number] = {belt = belt, belt_type = "belt"}
         elseif from_pos.x == splitter_pos.x and from_pos.y == splitter_pos.y then
-            output_belts[belt.unit_number] = belt
+            output_belts[belt.unit_number] = {belt = belt, belt_type = "belt" }
+        end
+    end
+
+    local found_underground_belts = splitter.surface.find_entities_filtered {
+        position = splitter_pos,
+        type = "underground-belt",
+        radius = 1
+    }
+    for _, underground_belt in pairs(found_underground_belts) do
+        local into_pos, from_pos = get_input_output_pos(underground_belt)
+        if underground_belt.belt_to_ground_type == "output" and into_pos.x == splitter_pos.x and into_pos.y == splitter_pos.y then
+            input_belts[underground_belt.unit_number] = {belt = underground_belt, belt_type = "underground"}
+        elseif underground_belt.belt_to_ground_type == "input" and from_pos.x == splitter_pos.x and from_pos.y == splitter_pos.y then
+            output_belts[underground_belt.unit_number] = {belt = underground_belt, belt_type = "underground"}
         end
     end
 
@@ -176,10 +192,10 @@ function balancer_add_splitter(balancer_id, splitter)
 
     local input_belts, output_belts = find_input_output_belts(splitter)
     for _, input_belt in pairs(input_belts) do
-        balancer_add_belt(balancer_id, input_belt, true)
+        balancer_add_belt(balancer_id, input_belt.belt, true, input_belt.belt_type)
     end
     for _, output_belt in pairs(output_belts) do
-        balancer_add_belt(balancer_id, output_belt, false)
+        balancer_add_belt(balancer_id, output_belt.belt, false, output_belt.belt_type)
     end
 end
 
@@ -203,7 +219,9 @@ end
 ---@param balancer_id number balancer to perform on
 ---@param belt LuaEntity the belt to add
 ---@param input boolean true if input, false if output
-function balancer_add_belt(balancer_id, belt, input)
+---@param belt_type string "belt", "underground" or "splitter"
+function balancer_add_belt(balancer_id, belt, input, belt_type)
+    belt_type = belt_type or "belt"
     local balancer = global.new_balancers[balancer_id]
 
     local belts, lanes
@@ -217,7 +235,13 @@ function balancer_add_belt(balancer_id, belt, input)
 
     belts[belt.unit_number] = belt
 
-    for i = 1, belt.get_max_transport_line_index() do
+    local max_transport_line_index = 0
+    if belt_type == "belt" then
+        max_transport_line_index = belt.get_max_transport_line_index()
+    elseif belt_type == "underground" then
+        max_transport_line_index = 2
+    end
+    for i = 1, max_transport_line_index do
         local transport_line = belt.get_transport_line(i)
         table.insert(lanes, transport_line)
     end

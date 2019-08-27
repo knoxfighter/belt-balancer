@@ -1,6 +1,37 @@
 require("helper/message-handler")
 require("objects/balancer")
 
+function add_belt(belt)
+    local into_balancer_index, from_balancer_index = get_input_output_balancer_index(belt)
+    if into_balancer_index then
+        balancer_add_belt(into_balancer_index, belt, true)
+    end
+    if from_balancer_index then
+        balancer_add_belt(from_balancer_index, belt, false)
+    end
+end
+function add_underground_belt(underground_belt)
+    -- get the input/output-index
+    local into_balancer_index, from_balancer_index = get_input_output_balancer_index(underground_belt)
+
+    -- underground-belts only need one direction to work with
+    if underground_belt.belt_to_ground_type == "output" and into_balancer_index then
+        balancer_add_belt(into_balancer_index, underground_belt, true,  "underground")
+    elseif underground_belt.belt_to_ground_type == "input" and from_balancer_index then
+        balancer_add_belt(from_balancer_index, underground_belt, false, "underground")
+    end
+end
+function remove_belt(belt, direction)
+    -- remove from balancers
+    local into_balancer_index, from_balancer_index = get_input_output_balancer_index(belt, direction)
+    if into_balancer_index then
+        balancer_remove_belt(into_balancer_index, belt, true)
+    end
+    if from_balancer_index then
+        balancer_remove_belt(from_balancer_index, belt, false)
+    end
+end
+
 script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity},
     function(e)
         if e.created_entity.name == "belt-balancer" then
@@ -34,17 +65,35 @@ script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_e
             end
         end
 
-        if e.created_entity.type == "transport-belt" then
-            local belt = e.created_entity
-
-            local into_balancer_index, from_balancer_index = get_input_output_balancer_index(belt)
-            if into_balancer_index then
-                balancer_add_belt(into_balancer_index, belt, true)
-            end
-            if from_balancer_index then
-                balancer_add_belt(from_balancer_index, belt, false)
-            end
+        if e.created_entity.type == "transport-belt" or e.created_entity.type == "splitter" then
+            add_belt(e.created_entity)
         end
+
+        if e.created_entity.type == "underground-belt" then
+            add_underground_belt(e.created_entity)
+        end
+
+        --if e.created_entity.type == "underground-belt" then
+        --    local belt = e.created_entity
+        --    print(belt.get_max_transport_line_index())
+        --    for i = 1, belt.get_max_transport_line_index() do
+        --        local line = belt.get_transport_line(i)
+        --        for _, input in pairs(line.input_lines) do
+        --            for j = 1, belt.get_max_transport_line_index() do
+        --                if input == belt.get_transport_line(j) then
+        --                    print(j .. " as input to " .. i)
+        --                end
+        --            end
+        --        end
+        --        for _, output in pairs(line.output_lines) do
+        --            for j = 1, belt.get_max_transport_line_index() do
+        --                if output == belt.get_transport_line(j) then
+        --                    print(j .. " as output to " .. i)
+        --                end
+        --            end
+        --        end
+        --    end
+        --end
     end
 )
 
@@ -87,7 +136,7 @@ script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_e
             end
         end
 
-        if e.entity.type == "transport-belt" then
+        if e.entity.type == "transport-belt" or e.entity.type == "underground-belt" then
             local belt = e.entity
             local into_balancer_index, from_balancer_index = get_input_output_balancer_index(belt)
 
@@ -104,24 +153,20 @@ script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_e
 script.on_event({defines.events.on_player_rotated_entity},
     function(e)
         if e.entity.type == "transport-belt" then
-            local belt = e.entity
+            remove_belt(e.entity, e.previous_direction)
+            add_belt(e.entity)
+        end
 
-            -- remove from balancers
-            local into_balancer_index, from_balancer_index = get_input_output_balancer_index(belt, e.previous_direction)
-            if into_balancer_index then
-                balancer_remove_belt(into_balancer_index, belt, true)
-            end
-            if from_balancer_index then
-                balancer_remove_belt(from_balancer_index, belt, false)
-            end
-
-            -- add to new balancers
-            local into_balancer_index, from_balancer_index = get_input_output_balancer_index(belt)
-            if into_balancer_index then
-                balancer_add_belt(into_balancer_index, belt, true)
-            end
-            if from_balancer_index then
-                balancer_add_belt(from_balancer_index, belt, false)
+        if e.entity.type == "underground-belt" then
+            remove_belt(e.entity, e.previous_direction)
+            add_underground_belt(e.entity)
+            -- Neighbour is only the other end
+            local neighbour = e.entity.neighbours
+            if neighbour and neighbour.valid then
+                -- make neighbour also have previous_direction
+                local previous_direction = (neighbour.direction + 4) % 8
+                remove_belt(neighbour, previous_direction)
+                add_belt(neighbour)
             end
         end
     end
