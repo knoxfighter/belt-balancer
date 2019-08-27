@@ -3,6 +3,8 @@ Version: 1.1.1
 Date: xx.xx.2019
   Feature:
     - added posibility to connect underground belts directly
+  Bugfix:
+    - Entity-Icon is shown now (e.g. in destrcution planner)
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.1
 Date: 04.08.2019
