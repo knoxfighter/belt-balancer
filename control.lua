@@ -16,9 +16,24 @@ function add_underground_belt(underground_belt)
 
     -- underground-belts only need one direction to work with
     if underground_belt.belt_to_ground_type == "output" and into_balancer_index then
-        balancer_add_belt(into_balancer_index, underground_belt, true,  "underground")
+        balancer_add_belt(into_balancer_index, underground_belt, true, "underground")
     elseif underground_belt.belt_to_ground_type == "input" and from_balancer_index then
         balancer_add_belt(from_balancer_index, underground_belt, false, "underground")
+    end
+end
+function add_splitter_belt(splitter)
+    local into_pos, from_pos = get_input_output_pos_splitter(splitter)
+    for _, into in pairs(into_pos) do
+        local balancer_id = get_balancer_index_from_pos(splitter.surface, into.position)
+        if balancer_id then
+            balancer_add_belt(balancer_id, splitter, true, "splitter", into.lanes)
+        end
+    end
+    for _, from in pairs(from_pos) do
+        local balancer_id = get_balancer_index_from_pos(splitter.surface, from.position)
+        if balancer_id then
+            balancer_add_belt(balancer_id, splitter, false, "splitter", from.lanes)
+        end
     end
 end
 function remove_belt(belt, direction)
@@ -31,8 +46,25 @@ function remove_belt(belt, direction)
         balancer_remove_belt(from_balancer_index, belt, false)
     end
 end
+function remove_splitter_belt(splitter, direction)
+    local into, from = get_input_output_pos_splitter(splitter, direction)
 
-script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_entity},
+    for _, into_single in pairs(into) do
+        local balancer_id = get_balancer_index_from_pos(splitter.surface, into_single.position)
+        if balancer_id then
+            balancer_remove_belt(balancer_id, splitter, false)
+        end
+    end
+
+    for _, from_single in pairs(from) do
+        local balancer_id = get_balancer_index_from_pos(splitter.surface, from_single.position)
+        if balancer_id then
+            balancer_remove_belt(balancer_id, splitter, true)
+        end
+    end
+end
+
+script.on_event({ defines.events.on_built_entity, defines.events.on_robot_built_entity },
     function(e)
         if e.created_entity.name == "belt-balancer" then
             local placed_splitter = e.created_entity
@@ -65,7 +97,7 @@ script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_e
             end
         end
 
-        if e.created_entity.type == "transport-belt" or e.created_entity.type == "splitter" then
+        if e.created_entity.type == "transport-belt" then
             add_belt(e.created_entity)
         end
 
@@ -73,31 +105,13 @@ script.on_event({defines.events.on_built_entity, defines.events.on_robot_built_e
             add_underground_belt(e.created_entity)
         end
 
-        --if e.created_entity.type == "underground-belt" then
-        --    local belt = e.created_entity
-        --    print(belt.get_max_transport_line_index())
-        --    for i = 1, belt.get_max_transport_line_index() do
-        --        local line = belt.get_transport_line(i)
-        --        for _, input in pairs(line.input_lines) do
-        --            for j = 1, belt.get_max_transport_line_index() do
-        --                if input == belt.get_transport_line(j) then
-        --                    print(j .. " as input to " .. i)
-        --                end
-        --            end
-        --        end
-        --        for _, output in pairs(line.output_lines) do
-        --            for j = 1, belt.get_max_transport_line_index() do
-        --                if output == belt.get_transport_line(j) then
-        --                    print(j .. " as output to " .. i)
-        --                end
-        --            end
-        --        end
-        --    end
-        --end
+        if e.created_entity.type == "splitter" then
+            add_splitter_belt(e.created_entity)
+        end
     end
 )
 
-script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_entity, defines.events.on_robot_mined_entity},
+script.on_event({ defines.events.on_entity_died, defines.events.on_player_mined_entity, defines.events.on_robot_mined_entity },
     function(e)
         if e.entity.name == "belt-balancer" then
             local removed_splitter = e.entity
@@ -137,20 +151,16 @@ script.on_event({defines.events.on_entity_died, defines.events.on_player_mined_e
         end
 
         if e.entity.type == "transport-belt" or e.entity.type == "underground-belt" then
-            local belt = e.entity
-            local into_balancer_index, from_balancer_index = get_input_output_balancer_index(belt)
+            remove_belt(e.entity)
+        end
 
-            if into_balancer_index then
-                balancer_remove_belt(into_balancer_index, belt, true)
-            end
-            if from_balancer_index then
-                balancer_remove_belt(from_balancer_index, belt, false)
-            end
+        if e.entity.type == "splitter" then
+            remove_splitter_belt(e.entity)
         end
     end
 )
 
-script.on_event({defines.events.on_player_rotated_entity},
+script.on_event({ defines.events.on_player_rotated_entity },
     function(e)
         if e.entity.type == "transport-belt" then
             remove_belt(e.entity, e.previous_direction)
@@ -168,6 +178,11 @@ script.on_event({defines.events.on_player_rotated_entity},
                 remove_belt(neighbour, previous_direction)
                 add_belt(neighbour)
             end
+        end
+
+        if e.entity.type == "splitter" then
+            remove_splitter_belt(e.entity, e.previous_direction)
+            add_splitter_belt(e.entity)
         end
     end
 )

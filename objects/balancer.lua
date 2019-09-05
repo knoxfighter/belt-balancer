@@ -52,9 +52,9 @@ function find_input_output_belts(splitter)
     for _, belt in pairs(found_belts) do
         local into_pos, from_pos = get_input_output_pos(belt)
         if into_pos.x == splitter_pos.x and into_pos.y == splitter_pos.y then
-            input_belts[belt.unit_number] = {belt = belt, belt_type = "belt"}
+            input_belts[belt.unit_number] = { belt = belt, belt_type = "belt" }
         elseif from_pos.x == splitter_pos.x and from_pos.y == splitter_pos.y then
-            output_belts[belt.unit_number] = {belt = belt, belt_type = "belt" }
+            output_belts[belt.unit_number] = { belt = belt, belt_type = "belt" }
         end
     end
 
@@ -66,9 +66,9 @@ function find_input_output_belts(splitter)
     for _, underground_belt in pairs(found_underground_belts) do
         local into_pos, from_pos = get_input_output_pos(underground_belt)
         if underground_belt.belt_to_ground_type == "output" and into_pos.x == splitter_pos.x and into_pos.y == splitter_pos.y then
-            input_belts[underground_belt.unit_number] = {belt = underground_belt, belt_type = "underground"}
+            input_belts[underground_belt.unit_number] = { belt = underground_belt, belt_type = "underground" }
         elseif underground_belt.belt_to_ground_type == "input" and from_pos.x == splitter_pos.x and from_pos.y == splitter_pos.y then
-            output_belts[underground_belt.unit_number] = {belt = underground_belt, belt_type = "underground"}
+            output_belts[underground_belt.unit_number] = { belt = underground_belt, belt_type = "underground" }
         end
     end
 
@@ -114,6 +114,60 @@ function get_input_output_pos(belt, direction)
     return into_pos, from_pos
 end
 
+---get_input_output_pos_splitter
+---get the positions where the splitter will transport items from and to
+---@param splitter LuaEntity the splitter to calculate on
+---@param direction defines.direction override the direction of the belt. if nil will use belt.direction
+---@return table[],table[] returns array (from,into) of positions and belt-lanes. -- array[] = { Position, array[] = number }.
+function get_input_output_pos_splitter(splitter, direction)
+    local splitter_pos = splitter.position
+    direction = direction or splitter.direction
+    local into_pos = {}
+    local from_pos = {}
+    local output_left_lanes = { 5, 6 }
+    local output_right_lanes = { 7, 8 }
+    local input_left_lanes = { 1, 2 }
+    local input_right_lanes = { 3, 4 }
+
+    if direction == defines.direction.north then
+        table.insert(into_pos, { position = { x = splitter_pos.x - 0.5, y = splitter_pos.y - 1 }, lanes = output_left_lanes })
+        table.insert(into_pos, { position = { x = splitter_pos.x + 0.5, y = splitter_pos.y - 1 }, lanes = output_right_lanes })
+        table.insert(from_pos, { position = { x = splitter_pos.x - 0.5, y = splitter_pos.y + 1 }, lanes = input_left_lanes })
+        table.insert(from_pos, { position = { x = splitter_pos.x + 0.5, y = splitter_pos.y + 1 }, lanes = input_right_lanes })
+    elseif direction == defines.direction.south then
+        table.insert(into_pos, { position = { x = splitter_pos.x - 0.5, y = splitter_pos.y + 1 }, lanes = output_right_lanes })
+        table.insert(into_pos, { position = { x = splitter_pos.x + 0.5, y = splitter_pos.y + 1 }, lanes = output_left_lanes })
+        table.insert(from_pos, { position = { x = splitter_pos.x - 0.5, y = splitter_pos.y - 1 }, lanes = input_right_lanes })
+        table.insert(from_pos, { position = { x = splitter_pos.x + 0.5, y = splitter_pos.y - 1 }, lanes = input_left_lanes })
+    elseif direction == defines.direction.west then
+        table.insert(into_pos, { position = { x = splitter_pos.x - 1, y = splitter_pos.y - 0.5 }, lanes = output_right_lanes })
+        table.insert(into_pos, { position = { x = splitter_pos.x - 1, y = splitter_pos.y + 0.5 }, lanes = output_left_lanes })
+        table.insert(from_pos, { position = { x = splitter_pos.x + 1, y = splitter_pos.y - 0.5 }, lanes = input_right_lanes })
+        table.insert(from_pos, { position = { x = splitter_pos.x + 1, y = splitter_pos.y + 0.5 }, lanes = input_left_lanes })
+    elseif direction == defines.direction.east then
+        table.insert(into_pos, { position = { x = splitter_pos.x + 1, y = splitter_pos.y - 0.5 }, lanes = output_left_lanes })
+        table.insert(into_pos, { position = { x = splitter_pos.x + 1, y = splitter_pos.y + 0.5 }, lanes = output_right_lanes })
+        table.insert(from_pos, { position = { x = splitter_pos.x - 1, y = splitter_pos.y - 0.5 }, lanes = input_left_lanes })
+        table.insert(from_pos, { position = { x = splitter_pos.x - 1, y = splitter_pos.y + 0.5 }, lanes = input_right_lanes })
+    end
+
+    return into_pos, from_pos
+end
+
+---get_balancer_index_from_pos
+---@param surface LuaSurface Surface where it is
+---@param position Position Position to look for balancer
+---@return number Balancer index
+function get_balancer_index_from_pos(surface, position)
+    local splitters = surface.find_entities_filtered {
+        position = position,
+        name = "belt-balancer"
+    }
+    for _, splitter in pairs(splitters) do
+        return find_belonging_balancer(splitter)
+    end
+end
+
 ---get_input_output_balancer_index
 ---get the index of the input and output balancers, this belt belongs to.
 ---@param belt LuaEntity the belt to search from
@@ -128,7 +182,7 @@ function get_input_output_balancer_index(belt, direction)
         name = "belt-balancer",
     }
     for _, splitter in pairs(into_splitter) do
-        into_balancer = find_belonging_balancer(splitter, direction)
+        into_balancer = find_belonging_balancer(splitter)
     end
 
     local from_splitter = belt.surface.find_entities_filtered {
@@ -220,8 +274,10 @@ end
 ---@param belt LuaEntity the belt to add
 ---@param input boolean true if input, false if output
 ---@param belt_type string "belt", "underground" or "splitter"
-function balancer_add_belt(balancer_id, belt, input, belt_type)
+---@param lane_ids number[] array of numbers, that override, the automatic transport_line indices
+function balancer_add_belt(balancer_id, belt, input, belt_type, lane_ids)
     belt_type = belt_type or "belt"
+    lane_ids = lane_ids or nil
     local balancer = global.new_balancers[balancer_id]
 
     local belts, lanes
@@ -235,15 +291,23 @@ function balancer_add_belt(balancer_id, belt, input, belt_type)
 
     belts[belt.unit_number] = belt
 
-    local max_transport_line_index = 0
-    if belt_type == "belt" then
-        max_transport_line_index = belt.get_max_transport_line_index()
-    elseif belt_type == "underground" then
-        max_transport_line_index = 2
-    end
-    for i = 1, max_transport_line_index do
-        local transport_line = belt.get_transport_line(i)
-        table.insert(lanes, transport_line)
+    if lane_ids then
+        for _, id in pairs(lane_ids) do
+            local transport_line = belt.get_transport_line(id)
+            table.insert(lanes, transport_line)
+        end
+    else
+        local max_transport_line_index = 0
+        if belt_type == "belt" then
+            max_transport_line_index = belt.get_max_transport_line_index()
+        elseif belt_type == "underground" then
+            max_transport_line_index = 2
+        end
+
+        for i = 1, max_transport_line_index do
+            local transport_line = belt.get_transport_line(i)
+            table.insert(lanes, transport_line)
+        end
     end
 
     -- update nth_tick
