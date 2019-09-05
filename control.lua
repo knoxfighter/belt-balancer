@@ -52,14 +52,14 @@ function remove_splitter_belt(splitter, direction)
     for _, into_single in pairs(into) do
         local balancer_id = get_balancer_index_from_pos(splitter.surface, into_single.position)
         if balancer_id then
-            balancer_remove_belt(balancer_id, splitter, false)
+            balancer_remove_belt(balancer_id, splitter, true)
         end
     end
 
     for _, from_single in pairs(from) do
         local balancer_id = get_balancer_index_from_pos(splitter.surface, from_single.position)
         if balancer_id then
-            balancer_remove_belt(balancer_id, splitter, true)
+            balancer_remove_belt(balancer_id, splitter, false)
         end
     end
 end
