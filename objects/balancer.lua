@@ -36,12 +36,12 @@ end
 ---find_input_output_belts
 ---find input and output belts for this specific splitter
 ---@param splitter LuaEntity the splitter to search from
----@return object[number]{LuaEntity, string},object[number]{LuaEntity, string} find input and output belts. Object is no direct array: object[number index]{ LuaEntity number, string belt_type }
+---@return object[],object[] -- found input and output belts. Object is no direct array: array[number]{ LuaEntity belt, string belt_type, ?number[] lanes }
 function find_input_output_belts(splitter)
     local splitter_pos = splitter.position
-    -- input_belts[belt_index] = { belt, belt_type }
+    -- input_belts[belt_index] = { belt, belt_type, lanes }
     local input_belts = {}
-    -- output_belts[belt_index] = { belt, belt_type }
+    -- output_belts[belt_index] = { belt, belt_type, lanes }
     local output_belts = {}
 
     local found_belts = splitter.surface.find_entities_filtered {
@@ -69,6 +69,25 @@ function find_input_output_belts(splitter)
             input_belts[underground_belt.unit_number] = { belt = underground_belt, belt_type = "underground" }
         elseif underground_belt.belt_to_ground_type == "input" and from_pos.x == splitter_pos.x and from_pos.y == splitter_pos.y then
             output_belts[underground_belt.unit_number] = { belt = underground_belt, belt_type = "underground" }
+        end
+    end
+
+    local found_splitter_belts = splitter.surface.find_entities_filtered {
+        position = splitter_pos,
+        type = "splitter",
+        radius = 1.5
+    }
+    for _, splitter_belt in pairs(found_splitter_belts) do
+        local into_pos, from_pos = get_input_output_pos_splitter(splitter_belt)
+        for _, into in pairs(into_pos) do
+            if into.position.x == splitter_pos.x and into.position.y == splitter_pos.y then
+                input_belts[splitter_belt.unit_number] = { belt = splitter_belt, belt_type = "splitter", lanes = into.lanes }
+            end
+        end
+        for _, from in pairs(from_pos) do
+            if from.position.x == splitter_pos.x and from.position.y == splitter_pos.y then
+                output_belts[splitter_belt.unit_number] = { belt = splitter_belt, belt_type = "splitter", lanes = from.lanes }
+            end
         end
     end
 
@@ -246,10 +265,10 @@ function balancer_add_splitter(balancer_id, splitter)
 
     local input_belts, output_belts = find_input_output_belts(splitter)
     for _, input_belt in pairs(input_belts) do
-        balancer_add_belt(balancer_id, input_belt.belt, true, input_belt.belt_type)
+        balancer_add_belt(balancer_id, input_belt.belt, true, input_belt.belt_type, input_belt.lanes)
     end
     for _, output_belt in pairs(output_belts) do
-        balancer_add_belt(balancer_id, output_belt.belt, false, output_belt.belt_type)
+        balancer_add_belt(balancer_id, output_belt.belt, false, output_belt.belt_type, output_belt.lanes)
     end
 end
 
