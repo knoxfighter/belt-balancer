@@ -1,8 +1,9 @@
 ---set_bobs_logistic_group
----@param recipe string recipe to change group
+---@param type string
+---@param recipe_name string recipe to change group
 ---@param tier number tier group to change subgroup
-function set_bobs_logistic_group(recipe_name, tier)
-    local recipe = data.raw.recipe[recipe_name]
+function set_bobs_logistic_group(type, recipe_name, tier)
+    local recipe = data.raw[type][recipe_name]
     recipe.group = "bob-logistics"
     recipe.subgroup = "bob-logistic-tier-" .. tier
 end
@@ -19,10 +20,12 @@ if mods["boblogistics"] then
     data.raw.technology["belt-balancer-5"].unit.count = 25 * (math.floor((data.raw.technology["logistics-5"].unit.count / 3 * 2) / 25))
 
     -- move recipes to boblogistics item group
-    set_bobs_logistic_group("belt-balancer-basic-belt", 0)
-    set_bobs_logistic_group("belt-balancer-normal-belt", 1)
-    set_bobs_logistic_group("belt-balancer-fast-belt", 2)
-    set_bobs_logistic_group("belt-balancer-express-belt", 3)
-    set_bobs_logistic_group("belt-balancer-turbo-belt", 4)
-    set_bobs_logistic_group("belt-balancer-ultimate-belt", 5)
+    set_bobs_logistic_group("recipe", "belt-balancer-basic-belt", 0)
+    set_bobs_logistic_group("recipe", "belt-balancer-normal-belt", 1)
+    set_bobs_logistic_group("recipe", "belt-balancer-fast-belt", 2)
+    set_bobs_logistic_group("recipe", "belt-balancer-express-belt", 3)
+    set_bobs_logistic_group("recipe", "belt-balancer-turbo-belt", 4)
+    set_bobs_logistic_group("recipe", "belt-balancer-ultimate-belt", 5)
+
+    set_bobs_logistic_group("item", "belt-balancer", 5)
 end
