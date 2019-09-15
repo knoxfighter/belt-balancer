@@ -4,11 +4,12 @@ Date: xx.xx.2019
   Feature:
     - added direct connection to underground belts
     - added direct connection to splitters
-    - added bobs logistics mod integration
   Bugfix:
     - Entity-Icon is shown now (e.g. in destruction planner)
-  Changes:
+  Breaking changes:
     - use advanced circuits in higher recipe
+  Compatibility:
+    - added bobs logistics mod integration
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.1
 Date: 04.08.2019
