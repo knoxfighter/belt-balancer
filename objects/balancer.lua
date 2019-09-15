@@ -262,10 +262,10 @@ function balancer_remove_splitter(balancer_id, splitter)
 
     local input_belts, output_belts = find_input_output_belts(splitter)
     for _, input_belt in pairs(input_belts) do
-        balancer_remove_belt(balancer_id, input_belt, true)
+        balancer_remove_belt(balancer_id, input_belt.belt, true)
     end
     for _, output_belt in pairs(output_belts) do
-        balancer_remove_belt(balancer_id, output_belt, false)
+        balancer_remove_belt(balancer_id, output_belt.belt, false)
     end
 end
 
