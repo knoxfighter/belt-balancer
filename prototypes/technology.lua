@@ -1,3 +1,5 @@
+require("helper.technology_calc")
+
 data:extend {
     {
         type = "technology",
@@ -30,7 +32,7 @@ data:extend {
         },
         prerequisites = { "logistics-2", "belt-balancer-1" },
         unit = {
-            count = 10 * math.floor((data.raw.technology["logistics-2"].unit.count / 3 * 2) / 10),
+            count = technology.calc_cost_round(data.raw.technology["logistics-2"].unit.count, 10),
             ingredients = data.raw.technology["logistics-2"].unit.ingredients,
             time = data.raw.technology["logistics-2"].unit.time
         },
@@ -48,7 +50,7 @@ data:extend {
         },
         prerequisites = { "logistics-3", "belt-balancer-2" },
         unit = {
-            count = 25 * math.floor((data.raw.technology["logistics-3"].unit.count / 3 * 2) / 25),
+            count = technology.calc_cost_round(data.raw.technology["logistics-3"].unit.count, 25),
             ingredients = data.raw.technology["logistics-3"].unit.ingredients,
             time = data.raw.technology["logistics-3"].unit.time
         },
@@ -89,7 +91,7 @@ if mods["boblogistics"] then
             },
             prerequisites = { "logistics-4", "belt-balancer-3" },
             unit = {
-                count = 25 * (math.floor((data.raw.technology["logistics-4"].unit.count / 3 * 2) / 25)),
+                count = technology.calc_cost_round(data.raw.technology["logistics-4"].unit.count, 25),
                 ingredients = data.raw.technology["logistics-4"].unit.ingredients,
                 time = data.raw.technology["logistics-4"].unit.time
             },
@@ -107,7 +109,7 @@ if mods["boblogistics"] then
             },
             prerequisites = { "logistics-5", "belt-balancer-4" },
             unit = {
-                count = 25 * (math.floor((data.raw.technology["logistics-5"].unit.count / 3 * 2) / 25)),
+                count = technology.calc_cost_round(data.raw.technology["logistics-5"].unit.count, 25),
                 ingredients = data.raw.technology["logistics-5"].unit.ingredients,
                 time = data.raw.technology["logistics-5"].unit.time
             },
