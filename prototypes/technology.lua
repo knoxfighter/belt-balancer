@@ -12,9 +12,9 @@ data:extend {
         },
         prerequisites = { "logistics" },
         unit = {
-            count = 20,
-            ingredients = { { "automation-science-pack", 1 } },
-            time = 15
+            count = data.raw.technology["logistics"].unit.count,
+            ingredients = data.raw.technology["logistics"].unit.ingredients,
+            time = data.raw.technology["logistics"].unit.time
         },
     },
     {
@@ -30,13 +30,9 @@ data:extend {
         },
         prerequisites = { "logistics-2", "belt-balancer-1" },
         unit = {
-            count = 100,
-            ingredients =
-            {
-                {"automation-science-pack", 1},
-                {"logistic-science-pack", 1}
-            },
-            time = 30
+            count = 10 * math.floor((data.raw.technology["logistics-2"].unit.count / 3 * 2) / 10),
+            ingredients = data.raw.technology["logistics-2"].unit.ingredients,
+            time = data.raw.technology["logistics-2"].unit.time
         },
     },
     {
@@ -52,15 +48,70 @@ data:extend {
         },
         prerequisites = { "logistics-3", "belt-balancer-2" },
         unit = {
-            count = 200,
-            ingredients =
-            {
-                {"automation-science-pack", 1},
-                {"logistic-science-pack", 1},
-                {"chemical-science-pack", 1},
-                {"production-science-pack", 1}
-            },
-            time = 20
+            count = 25 * math.floor((data.raw.technology["logistics-3"].unit.count / 3 * 2) / 25),
+            ingredients = data.raw.technology["logistics-3"].unit.ingredients,
+            time = data.raw.technology["logistics-3"].unit.time
         },
     }
 }
+
+if mods["boblogistics"] then
+    data:extend {
+        {
+            type = "technology",
+            name = "belt-balancer-0",
+            icon = "__belt-balancer__/graphics/icons/balancer.png",
+            icon_size = 200,
+            effects = {
+                {
+                    type = "unlock-recipe",
+                    recipe = "belt-balancer-basic-belt",
+                }
+            },
+            prerequisites = { "logistics-0" },
+            unit = {
+                count = data.raw.technology["logistics-0"].unit.count,
+                ingredients = data.raw.technology["logistics-0"].unit.ingredients,
+                time = data.raw.technology["logistics-0"].unit.time
+            },
+        },
+        {
+            type = "technology",
+            name = "belt-balancer-4",
+            icon = "__belt-balancer__/graphics/icons/balancer.png",
+            icon_size = 200,
+            effects = {
+                {
+                    type = "unlock-recipe",
+                    recipe = "belt-balancer-turbo-belt",
+                }
+            },
+            prerequisites = { "logistics-4", "belt-balancer-3" },
+            unit = {
+                count = 25 * (math.floor((data.raw.technology["logistics-4"].unit.count / 3 * 2) / 25)),
+                ingredients = data.raw.technology["logistics-4"].unit.ingredients,
+                time = data.raw.technology["logistics-4"].unit.time
+            },
+        },
+        {
+            type = "technology",
+            name = "belt-balancer-5",
+            icon = "__belt-balancer__/graphics/icons/balancer.png",
+            icon_size = 200,
+            effects = {
+                {
+                    type = "unlock-recipe",
+                    recipe = "belt-balancer-ultimate-belt",
+                }
+            },
+            prerequisites = { "logistics-5", "belt-balancer-4" },
+            unit = {
+                count = 25 * (math.floor((data.raw.technology["logistics-5"].unit.count / 3 * 2) / 25)),
+                ingredients = data.raw.technology["logistics-5"].unit.ingredients,
+                time = data.raw.technology["logistics-5"].unit.time
+            },
+        }
+    }
+
+    table.insert(data.raw.technology["belt-balancer-1"].prerequisites, "belt-balancer-0")
+end
