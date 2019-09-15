@@ -45,6 +45,7 @@ data:extend {
 }
 
 if mods["boblogistics"] then
+    -- add recipes for the additional boblogistics belts
     data:extend {
         {
             type = "recipe",
@@ -89,5 +90,26 @@ if mods["boblogistics"] then
             },
             order = "d[balancer]-e[balancer]"
         },
+    }
+end
+
+-- Update recipes for IR-Integration!
+-- Iron is not available in early stages, so recipes are basedon early game items
+-- Pistons are imho a very good ingredient
+if mods["IndustrialRevolution"] then
+    data.raw.recipe["belt-balancer-normal-belt"].ingredients = {
+        { "transport-belt", 10 },
+        { "tin-plate", 15 },
+        { "copper-piston", 10 },
+    }
+    data.raw.recipe["belt-balancer-fast-belt"].ingredients = {
+        { "fast-transport-belt", 10 },
+        { "iron-plate", 15 },
+        { "iron-piston", 10 },
+    }
+    data.raw.recipe["belt-balancer-express-belt"].ingredients = {
+        { "express-transport-belt", 10 },
+        { "steel-plate", 15 },
+        { "steel-piston", 10 },
     }
 end

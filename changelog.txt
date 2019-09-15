@@ -10,6 +10,7 @@ Date: xx.xx.2019
     - use advanced circuits in higher recipe
   Compatibility:
     - added bobs logistics mod integration
+    - added Industrial Revolution integration
 ---------------------------------------------------------------------------------------------------
 Version: 1.0.1
 Date: 04.08.2019

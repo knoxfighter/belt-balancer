@@ -55,6 +55,7 @@ data:extend {
     }
 }
 
+-- add additional technologies for the boblogistics belts
 if mods["boblogistics"] then
     data:extend {
         {

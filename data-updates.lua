@@ -10,6 +10,7 @@ end
 if mods["boblogistics"] then
     -- recalculate technology costs
     -- this is a simple mathToFloor to 10/25 exponent
+    -- this has to be done, cause boblogistics is updating the costs in data-updates too.
     data.raw.technology["belt-balancer-0"].unit.count = data.raw.technology["logistics-0"].unit.count
     data.raw.technology["belt-balancer-1"].unit.count = data.raw.technology["logistics"].unit.count
     data.raw.technology["belt-balancer-2"].unit.count = 10 * (math.floor((data.raw.technology["logistics-2"].unit.count / 3 * 2) / 10))
