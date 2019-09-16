@@ -5,6 +5,6 @@
   "author": "knoxfighter",
   "contact": "factorio@asdff45.de",
   "factorio_version": "0.17",
-  "dependencies": ["base >= 0.17.46", "(?) boblogistics >= 0.17.0", "(?) bobplates >= 0.17.0" , "(?) IndustrialRevolution"],
+  "dependencies": ["base >= 0.17.46", "(?) boblogistics >= 0.17.0", "(?) bobplates >= 0.17.0" , "? IndustrialRevolution"],
   "description": "Adds Balancer Parts, that can be put together, to balance all adjusting lanes."
 }
