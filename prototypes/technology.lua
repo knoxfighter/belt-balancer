@@ -59,25 +59,31 @@ data:extend {
 
 -- add additional technologies for the boblogistics belts
 if mods["boblogistics"] then
+    if settings.startup["bobmods-logistics-beltoverhaul"].value == true then
+        data:extend {
+            {
+                type = "technology",
+                name = "belt-balancer-0",
+                icon = "__belt-balancer__/graphics/icons/balancer.png",
+                icon_size = 200,
+                effects = {
+                    {
+                        type = "unlock-recipe",
+                        recipe = "belt-balancer-basic-belt",
+                    }
+                },
+                prerequisites = { "logistics-0" },
+                unit = {
+                    count = data.raw.technology["logistics-0"].unit.count,
+                    ingredients = data.raw.technology["logistics-0"].unit.ingredients,
+                    time = data.raw.technology["logistics-0"].unit.time
+                },
+            }
+        }
+        table.insert(data.raw.technology["belt-balancer-1"].prerequisites, "belt-balancer-0")
+    end
+
     data:extend {
-        {
-            type = "technology",
-            name = "belt-balancer-0",
-            icon = "__belt-balancer__/graphics/icons/balancer.png",
-            icon_size = 200,
-            effects = {
-                {
-                    type = "unlock-recipe",
-                    recipe = "belt-balancer-basic-belt",
-                }
-            },
-            prerequisites = { "logistics-0" },
-            unit = {
-                count = data.raw.technology["logistics-0"].unit.count,
-                ingredients = data.raw.technology["logistics-0"].unit.ingredients,
-                time = data.raw.technology["logistics-0"].unit.time
-            },
-        },
         {
             type = "technology",
             name = "belt-balancer-4",
@@ -115,6 +121,4 @@ if mods["boblogistics"] then
             },
         }
     }
-
-    table.insert(data.raw.technology["belt-balancer-1"].prerequisites, "belt-balancer-0")
 end

@@ -46,20 +46,25 @@ data:extend {
 
 if mods["boblogistics"] then
     -- add recipes for the additional boblogistics belts
-    data:extend {
-        {
-            type = "recipe",
-            name = "belt-balancer-basic-belt",
-            enabled = false,
-            energy_required = 5,
-            ingredients = {
-                { "iron-gear-wheel", 25 },
-                { "electronic-circuit", 20 },
-                { "basic-transport-belt", 10 },
+    if settings.startup["bobmods-logistics-beltoverhaul"].value == true then
+        data:extend {
+            {
+                type = "recipe",
+                name = "belt-balancer-basic-belt",
+                enabled = false,
+                energy_required = 5,
+                ingredients = {
+                    { "iron-gear-wheel", 25 },
+                    { "electronic-circuit", 20 },
+                    { "basic-transport-belt", 10 },
+                },
+                result = "belt-balancer",
+                order = "d[balancer]-0a[balancer]"
             },
-            result = "belt-balancer",
-            order = "d[balancer]-0a[balancer]"
-        },
+        }
+    end
+
+    data:extend {
         {
             type = "recipe",
             name = "belt-balancer-turbo-belt",
