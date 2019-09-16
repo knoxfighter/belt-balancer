@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.2
+Date: 16.09.2019
+  Bugfix:
+    - fixed crash, when beltoverhaul is disabled
+  Breaking changes:
+    - Use advanced-processing-unit in bob-T5 recipe
+---------------------------------------------------------------------------------------------------
 Version: 1.1.1
 Date: 15.09.2019
   Bugfix:
