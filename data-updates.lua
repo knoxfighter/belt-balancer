@@ -34,4 +34,14 @@ if mods["boblogistics"] then
     set_bobs_logistic_group("recipe", "belt-balancer-ultimate-belt", 5)
 
     set_bobs_logistic_group("item", "belt-balancer", 5)
+
+    if data.raw.item["advanced-processing-unit"] then
+        for k, v in pairs(data.raw.recipe["belt-balancer-ultimate-belt"].ingredients) do
+            if v[1] == "processing-unit" then
+                v[1] = "advanced-processing-unit"
+                v[2] = 3
+                break
+            end
+        end
+    end
 end
