@@ -36,7 +36,7 @@ end
 ---find_input_output_belts
 ---find input and output belts for this specific splitter
 ---@param splitter LuaEntity the splitter to search from
----@return object[],object[] -- found input and output belts. Object is no direct array: array[number]{ LuaEntity belt, string belt_type, ?number[] lanes }
+---@return table[],table[] -- found input and output belts. Object is no direct array: array[number]{ LuaEntity belt, string belt_type, ?number[] lanes }
 function find_input_output_belts(splitter)
     local splitter_pos = splitter.position
     -- input_belts[belt_index] = { belt, belt_type, lanes }

@@ -64,54 +64,77 @@ function remove_splitter_belt(splitter, direction)
     end
 end
 
-script.on_event({ defines.events.on_built_entity, defines.events.on_robot_built_entity },
-    function(e)
-        if e.created_entity.name == "belt-balancer" then
-            local placed_splitter = e.created_entity
+function entity_created(e)
+    ---@type LuaEntity
+    local entity
 
-            local nearby_balancer_indices = find_nearby_balancer(placed_splitter)
-            local nearby_balancer_amount = table_size(nearby_balancer_indices)
+    if e.entity then
+        entity = e.entity
+    else
+        entity = e.created_entity
+    end
 
-            if nearby_balancer_amount == 0 then
-                -- create new balancer
-                new_balancer(placed_splitter)
-            elseif nearby_balancer_amount == 1 then
-                -- add to existing balancer
-                for _, nearby_balancer_index in pairs(nearby_balancer_indices) do
-                    balancer_add_splitter(nearby_balancer_index, placed_splitter)
-                end
-            elseif nearby_balancer_amount >= 2 then
-                -- add to existing balancer and merge them
-                local base_balancer_index
-                for _, nearby_balancer_index in pairs(nearby_balancer_indices) do
-                    if not base_balancer_index then
-                        base_balancer_index = nearby_balancer_index
+    if entity.name == "belt-balancer" then
+        local placed_splitter = entity
 
-                        -- add splitter to balancer
-                        balancer_add_splitter(base_balancer_index, placed_splitter)
-                    else
-                        -- merge balancer and remove them from global table
-                        balancer_merge_balancer(base_balancer_index, nearby_balancer_index)
-                    end
+        local nearby_balancer_indices = find_nearby_balancer(placed_splitter)
+        local nearby_balancer_amount = table_size(nearby_balancer_indices)
+
+        if nearby_balancer_amount == 0 then
+            -- create new balancer
+            new_balancer(placed_splitter)
+        elseif nearby_balancer_amount == 1 then
+            -- add to existing balancer
+            for _, nearby_balancer_index in pairs(nearby_balancer_indices) do
+                balancer_add_splitter(nearby_balancer_index, placed_splitter)
+            end
+        elseif nearby_balancer_amount >= 2 then
+            -- add to existing balancer and merge them
+            local base_balancer_index
+            for _, nearby_balancer_index in pairs(nearby_balancer_indices) do
+                if not base_balancer_index then
+                    base_balancer_index = nearby_balancer_index
+
+                    -- add splitter to balancer
+                    balancer_add_splitter(base_balancer_index, placed_splitter)
+                else
+                    -- merge balancer and remove them from global table
+                    balancer_merge_balancer(base_balancer_index, nearby_balancer_index)
                 end
             end
         end
-
-        if e.created_entity.type == "transport-belt" then
-            add_belt(e.created_entity)
-        end
-
-        if e.created_entity.type == "underground-belt" then
-            add_underground_belt(e.created_entity)
-        end
-
-        if e.created_entity.type == "splitter" then
-            add_splitter_belt(e.created_entity)
-        end
     end
+
+    if entity.type == "transport-belt" then
+        add_belt(entity)
+    end
+
+    if entity.type == "underground-belt" then
+        add_underground_belt(entity)
+    end
+
+    if entity.type == "splitter" then
+        add_splitter_belt(entity)
+    end
+end
+
+script.on_event(
+    {
+        defines.events.on_built_entity,
+        defines.events.on_robot_built_entity,
+        defines.events.script_raised_built,
+        defines.events.script_raised_revive
+    },
+    entity_created
 )
 
-script.on_event({ defines.events.on_entity_died, defines.events.on_player_mined_entity, defines.events.on_robot_mined_entity },
+script.on_event(
+    {
+        defines.events.on_entity_died,
+        defines.events.on_player_mined_entity,
+        defines.events.on_robot_mined_entity,
+        defines.events.script_raised_destroy
+    },
     function(e)
         if e.entity.name == "belt-balancer" then
             local removed_splitter = e.entity
