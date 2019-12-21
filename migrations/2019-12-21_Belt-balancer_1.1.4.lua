@@ -13,6 +13,6 @@ global.events = {}
 for _, surface in pairs(game.surfaces) do
     local all_balancer = surface.find_entities_filtered { name = { "belt-balancer" } }
     for i = 1, #all_balancer do
-        entity_created({entity = all_balancer[i]})
+        created_entity({ entity = all_balancer[i]})
     end
 end

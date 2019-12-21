@@ -64,7 +64,7 @@ function remove_splitter_belt(splitter, direction)
     end
 end
 
-function entity_created(e)
+function created_entity(e)
     ---@type LuaEntity
     local entity
 
@@ -125,8 +125,55 @@ script.on_event(
         defines.events.script_raised_built,
         defines.events.script_raised_revive
     },
-    entity_created
+    created_entity
 )
+
+function removed_entity(e)
+    if e.entity.name == "belt-balancer" then
+        local removed_splitter = e.entity
+
+        local balancer_index = find_belonging_balancer(removed_splitter)
+        balancer_remove_splitter(balancer_index, removed_splitter)
+        if not balancer_is_valid(balancer_index) then
+            -- give player buffer items
+            if e.name == defines.events.on_player_mined_entity or e.name == defines.events.on_robot_mined_entity then
+                for _, item in pairs(global.new_balancers[balancer_index].buffer) do
+                    e.buffer.insert(item)
+                end
+            end
+
+            -- delete balancer
+            global.new_balancers[balancer_index] = nil
+            unregister_on_tick(balancer_index)
+            return
+        end
+
+        local linked_splitter = balancer_get_linked(balancer_index)
+        if table_size(linked_splitter) > 1 then
+            -- give player buffer items
+            if e.name == defines.events.on_player_mined_entity or e.name == defines.events.on_robot_mined_entity then
+                for _, item in pairs(global.new_balancers[balancer_index].buffer) do
+                    e.buffer.insert(item)
+                end
+            end
+
+            -- create multiple new balancers
+            for _, splitter_group in pairs(linked_splitter) do
+                new_balancer(splitter_group)
+            end
+            global.new_balancers[balancer_index] = nil
+            unregister_on_tick(balancer_index)
+        end
+    end
+
+    if e.entity.type == "transport-belt" or e.entity.type == "underground-belt" then
+        remove_belt(e.entity)
+    end
+
+    if e.entity.type == "splitter" then
+        remove_splitter_belt(e.entity)
+    end
+end
 
 script.on_event(
     {
@@ -135,53 +182,13 @@ script.on_event(
         defines.events.on_robot_mined_entity,
         defines.events.script_raised_destroy
     },
-    function(e)
-        if e.entity.name == "belt-balancer" then
-            local removed_splitter = e.entity
-
-            local balancer_index = find_belonging_balancer(removed_splitter)
-            balancer_remove_splitter(balancer_index, removed_splitter)
-            if not balancer_is_valid(balancer_index) then
-                -- give player buffer items
-                if e.name == defines.events.on_player_mined_entity or e.name == defines.events.on_robot_mined_entity then
-                    for _, item in pairs(global.new_balancers[balancer_index].buffer) do
-                        e.buffer.insert(item)
-                    end
-                end
-
-                -- delete balancer
-                global.new_balancers[balancer_index] = nil
-                unregister_on_tick(balancer_index)
-                return
-            end
-
-            local linked_splitter = balancer_get_linked(balancer_index)
-            if table_size(linked_splitter) > 1 then
-                -- give player buffer items
-                if e.name == defines.events.on_player_mined_entity or e.name == defines.events.on_robot_mined_entity then
-                    for _, item in pairs(global.new_balancers[balancer_index].buffer) do
-                        e.buffer.insert(item)
-                    end
-                end
-
-                -- create multiple new balancers
-                for _, splitter_group in pairs(linked_splitter) do
-                    new_balancer(splitter_group)
-                end
-                global.new_balancers[balancer_index] = nil
-                unregister_on_tick(balancer_index)
-            end
-        end
-
-        if e.entity.type == "transport-belt" or e.entity.type == "underground-belt" then
-            remove_belt(e.entity)
-        end
-
-        if e.entity.type == "splitter" then
-            remove_splitter_belt(e.entity)
-        end
-    end
+    removed_entity
 )
+
+script.on_event({ defines.events.on_entity_cloned }, function(event)
+    --event.source
+    created_entity({ entity = event.destination })
+end)
 
 script.on_event({ defines.events.on_player_rotated_entity },
     function(e)
