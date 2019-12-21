@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.4
+Date: 22.12.2019
+  Bugfix:
+    - fixed crash, when entities are cloned
+    - fixed crash, when entities are created via script_raised_* events
+---------------------------------------------------------------------------------------------------
 Version: 1.1.3
 Date: 24.09.2019
   Bugfix:
