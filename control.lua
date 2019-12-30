@@ -241,8 +241,10 @@ end)
 -- If some mod is changed, so train-stops are not valid anymore ... also reload
 script.on_configuration_changed(
     function(e)
+        ---@type ModConfigurationChangedData
         local boblogistics_changes = e.mod_changes["boblogistics"]
-        if boblogistics_changes and boblogistics_changes.old_version == nil and boblogistics_changes.new_version then
+
+        if boblogistics_changes and boblogistics_changes.old_version == nil and boblogistics_changes.new_version and settings.startup["bobmods-logistics-beltoverhaul"].value == true then
             -- on boblogistics got added!
             for _, force in pairs(game.forces) do
                 local technologies = force.technologies
