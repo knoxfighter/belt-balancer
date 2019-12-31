@@ -258,3 +258,23 @@ script.on_configuration_changed(
 )
 
 script.on_load(reregister_on_tick)
+
+commands.add_command("belt-balancer-statistics", "", function(e)
+    local balancer_amount = #global.new_balancers
+    local balancer_part_amount = 0
+    local balancer_input_belt_amount = 0
+    local balancer_output_belt_amount = 0
+
+    for _, balancer in pairs(global.new_balancers) do
+        balancer_part_amount = balancer_part_amount + table_size(balancer.splitter)
+        balancer_input_belt_amount = balancer_input_belt_amount + table_size(balancer.input_belts)
+        balancer_output_belt_amount = balancer_output_belt_amount + table_size(balancer.output_belts)
+    end
+
+    local output = "balancers: " .. balancer_amount ..
+                   "\nbalancer-parts: " .. balancer_part_amount ..
+                   "\nbalancer_input_belts: " .. balancer_input_belt_amount ..
+                   "\nbalancer_output_belts: " .. balancer_output_belt_amount
+    game.get_player(e.player_index).print(output)
+    print(output)
+end)
