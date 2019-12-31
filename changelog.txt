@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: Unreleased
+Date: Unreleased
+  Added:
+    - Command to print out belt-balancer statistics (/belt-balancer-statistics)
+---------------------------------------------------------------------------------------------------
 Version: 1.1.5
 Date: 30.12.2019
   Bugfix:
