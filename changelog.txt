@@ -1,8 +1,10 @@
 ---------------------------------------------------------------------------------------------------
-Version: Unreleased
-Date: Unreleased
+Version: 1.1.6
+Date: 16.01.2020
   Added:
     - Command to print out belt-balancer statistics (/belt-balancer-statistics)
+  Bugfix:
+    - fixed script mismatch, when adding mod to an existing save
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.5
 Date: 30.12.2019
