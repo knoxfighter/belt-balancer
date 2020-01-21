@@ -4,6 +4,8 @@ Date: 21.01.2020
   Breaking changes:
     - Compatibility with factorio 0.18.0
     - Incompatible with factorio 0.17 now!
+    - Removed IndustrialRevolution compatibility (IR is not developed anymore)
+    - Removed bobs mods Integration until bob updates to 0.18
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.6
 Date: 16.01.2020
