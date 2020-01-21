@@ -238,24 +238,24 @@ script.on_init(function()
     end
 end)
 
--- If some mod is changed, so train-stops are not valid anymore ... also reload
-script.on_configuration_changed(
-    function(e)
-        ---@type ModConfigurationChangedData
-        local boblogistics_changes = e.mod_changes["boblogistics"]
-
-        if boblogistics_changes and boblogistics_changes.old_version == nil and boblogistics_changes.new_version and settings.startup["bobmods-logistics-beltoverhaul"].value == true then
-            -- on boblogistics got added!
-            for _, force in pairs(game.forces) do
-                local technologies = force.technologies
-                local recipes = force.recipes
-
-                technologies["belt-balancer-0"].researched = technologies["belt-balancer-1"].researched
-                recipes["belt-balancer-basic-belt"].enabled = technologies["belt-balancer-1"].researched
-            end
-        end
-    end
-)
+-- TODO add back in, when bobs mods are updated to 0.18
+--script.on_configuration_changed(
+--    function(e)
+--        ---@type ModConfigurationChangedData
+--        local boblogistics_changes = e.mod_changes["boblogistics"]
+--
+--        if boblogistics_changes and boblogistics_changes.old_version == nil and boblogistics_changes.new_version and settings.startup["bobmods-logistics-beltoverhaul"].value == true then
+--            -- on boblogistics got added!
+--            for _, force in pairs(game.forces) do
+--                local technologies = force.technologies
+--                local recipes = force.recipes
+--
+--                technologies["belt-balancer-0"].researched = technologies["belt-balancer-1"].researched
+--                recipes["belt-balancer-basic-belt"].enabled = technologies["belt-balancer-1"].researched
+--            end
+--        end
+--    end
+--)
 
 script.on_load(reregister_on_tick)
 
