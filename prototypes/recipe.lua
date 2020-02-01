@@ -44,59 +44,58 @@ data:extend {
     },
 }
 
--- TODO add back in, when bobs mods are updated to 0.18
---if mods["boblogistics"] then
---    -- add recipes for the additional boblogistics belts
---    if settings.startup["bobmods-logistics-beltoverhaul"].value == true then
---        data:extend {
---            {
---                type = "recipe",
---                name = "belt-balancer-basic-belt",
---                enabled = false,
---                energy_required = 5,
---                ingredients = {
---                    { "iron-gear-wheel", 25 },
---                    { "electronic-circuit", 20 },
---                    { "basic-transport-belt", 10 },
---                },
---                result = "belt-balancer",
---                order = "d[balancer]-0a[balancer]"
---            },
---        }
---    end
---
---    data:extend {
---        {
---            type = "recipe",
---            name = "belt-balancer-turbo-belt",
---            enabled = false,
---            energy_required = 1.8,
---            ingredients = {
---                { "iron-gear-wheel", 20 },
---                { "processing-unit", 3 },
---                { "turbo-transport-belt", 10 },
---            },
---            results = {
---                { "belt-balancer", 4 }
---            },
---            order = "d[balancer]-d[balancer]"
---        },
---        {
---            type = "recipe",
---            name = "belt-balancer-ultimate-belt",
---            enabled = false,
---            energy_required = 1.5,
---            ingredients = {
---                { "iron-gear-wheel", 20 },
---                { "processing-unit", 5 },
---                { "ultimate-transport-belt", 10 },
---            },
---            results = {
---                { "belt-balancer", 5 }
---            },
---            order = "d[balancer]-e[balancer]"
---        },
---    }
---end
+if mods["boblogistics"] then
+    -- add recipes for the additional boblogistics belts
+    if settings.startup["bobmods-logistics-beltoverhaul"].value == true then
+        data:extend {
+            {
+                type = "recipe",
+                name = "belt-balancer-basic-belt",
+                enabled = false,
+                energy_required = 5,
+                ingredients = {
+                    { "iron-gear-wheel", 25 },
+                    { "electronic-circuit", 20 },
+                    { "basic-transport-belt", 10 },
+                },
+                result = "belt-balancer",
+                order = "d[balancer]-0a[balancer]"
+            },
+        }
+    end
+
+    data:extend {
+        {
+            type = "recipe",
+            name = "belt-balancer-turbo-belt",
+            enabled = false,
+            energy_required = 1.8,
+            ingredients = {
+                { "iron-gear-wheel", 20 },
+                { "processing-unit", 3 },
+                { "turbo-transport-belt", 10 },
+            },
+            results = {
+                { "belt-balancer", 4 }
+            },
+            order = "d[balancer]-d[balancer]"
+        },
+        {
+            type = "recipe",
+            name = "belt-balancer-ultimate-belt",
+            enabled = false,
+            energy_required = 1.5,
+            ingredients = {
+                { "iron-gear-wheel", 20 },
+                { "processing-unit", 5 },
+                { "ultimate-transport-belt", 10 },
+            },
+            results = {
+                { "belt-balancer", 5 }
+            },
+            order = "d[balancer]-e[balancer]"
+        },
+    }
+end
 
 -- NOTICE IndustrialRevolution is not developed anymore and it will not be updated to 0.18 :(
