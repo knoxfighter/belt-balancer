@@ -1,4 +1,4 @@
-if settings.startup["bobmods-logistics-beltoverhaul"].value == true then
+if settings.startup["bobmods-logistics-beltoverhaul"] and settings.startup["bobmods-logistics-beltoverhaul"].value == true then
     -- on boblogistics is already there
     for _, force in pairs(game.forces) do
         local technologies = force.technologies
