@@ -526,18 +526,23 @@ function balancer_on_tick(balancer_id, tick)
             end
 
             local lane = balancer.input_lanes[balancer.current_input_lane]
-            if lane and lane.valid then
-                if #lane > 0 then
-                    -- remove item from lane and add to buffer
-                    local lua_item = lane[1]
-                    local simple_item = convert_LuaItemStack_to_SimpleItemStack(lua_item)
-                    lane.remove_item(lua_item)
-                    table.insert(balancer.buffer, simple_item)
-                    gather_amount = gather_amount - 1
-                    last_one_failed = 0
+            if lane then
+                if lane.valid then
+                    -- this lane is not valid, remove it for the sake of my mind and as a workaround.
+                    balancer.input_lanes[balancer.current_input_lane] = nil
                 else
-                    if last_one_failed == 0 then
-                        last_one_failed = balancer.current_input_lane
+                    if #lane > 0 then
+                        -- remove item from lane and add to buffer
+                        local lua_item = lane[1]
+                        local simple_item = convert_LuaItemStack_to_SimpleItemStack(lua_item)
+                        lane.remove_item(lua_item)
+                        table.insert(balancer.buffer, simple_item)
+                        gather_amount = gather_amount - 1
+                        last_one_failed = 0
+                    else
+                        if last_one_failed == 0 then
+                            last_one_failed = balancer.current_input_lane
+                        end
                     end
                 end
             end
