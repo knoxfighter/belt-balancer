@@ -5,12 +5,12 @@ require("helper.technology_calc")
 ---@param recipe_name string recipe to change group
 ---@param tier number tier group to change subgroup
 function set_bobs_logistic_group(type, recipe_name, tier)
+    ---@type Prototype_Recipe
     local recipe = data.raw[type][recipe_name]
     recipe.group = "bob-logistics"
     recipe.subgroup = "bob-logistic-tier-" .. tier
 end
 
-print(serpent.block(data.raw.recipe))
 if mods["boblogistics"] then
     -- recalculate technology costs
     -- this is a simple mathToFloor to 10/25 exponent
