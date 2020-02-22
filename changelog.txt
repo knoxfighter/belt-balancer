@@ -1,8 +1,36 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.1.8
+Date: 22.02.2020
+  Bugfix:
+    - Fixed freeze, when updating to 1.1.7. (This version can have long migration times!)
+---------------------------------------------------------------------------------------------------
+Version: 2.0.3
+Date: 19.02.2020
+  Bugfix:
+    - Added workaround to fix infinite loop, when removing balancer-parts.
+---------------------------------------------------------------------------------------------------
 Version: 1.1.7
 Date: 19.02.2020
   Bugfix:
     - Added workaround to fix infinite loop, when removing balancer-parts.
+---------------------------------------------------------------------------------------------------
+Version: 2.0.2
+Date: 01.02.2020
+  Bugfix:
+    - Fixed migration, when Bobs Mods are not installed
+---------------------------------------------------------------------------------------------------
+Version: 2.0.1
+Date: 01.02.2020
+  Bugfix:
+    - Reenabled Bob's Mods Integration
+---------------------------------------------------------------------------------------------------
+Version: 2.0.0
+Date: 21.01.2020
+  Breaking changes:
+    - Compatibility with factorio 0.18.0
+    - Incompatible with factorio 0.17 now!
+    - Removed IndustrialRevolution compatibility (IR is not developed anymore)
+    - Removed bobs mods Integration until bob updates to 0.18
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.6
 Date: 16.01.2020
