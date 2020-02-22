@@ -527,7 +527,7 @@ function balancer_on_tick(balancer_id, tick)
 
             local lane = balancer.input_lanes[balancer.current_input_lane]
             if lane then
-                if lane.valid then
+                if not lane.valid then
                     -- this lane is not valid, remove it for the sake of my mind and as a workaround.
                     balancer.input_lanes[balancer.current_input_lane] = nil
                 else
