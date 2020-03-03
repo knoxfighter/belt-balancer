@@ -9,7 +9,7 @@ data:extend {
             { "electronic-circuit", 15 },
             { "transport-belt", 5 },
         },
-        result = "belt-balancer",
+        result = "balancer-part",
         order = "d[balancer]-a[balancer]"
     },
     {
@@ -23,7 +23,7 @@ data:extend {
             { "fast-transport-belt", 5 },
         },
         results = {
-            { "belt-balancer", 2 }
+            { "balancer-part", 2 }
         },
         order = "d[balancer]-b[balancer]"
     },
@@ -38,7 +38,7 @@ data:extend {
             { "express-transport-belt", 5 },
         },
         results = {
-            { "belt-balancer", 3 }
+            { "balancer-part", 3 }
         },
         order = "d[balancer]-c[balancer]"
     },
@@ -58,7 +58,7 @@ if mods["boblogistics"] then
                     { "electronic-circuit", 20 },
                     { "basic-transport-belt", 10 },
                 },
-                result = "belt-balancer",
+                result = "balancer-part",
                 order = "d[balancer]-0a[balancer]"
             },
         }
@@ -76,7 +76,7 @@ if mods["boblogistics"] then
                 { "turbo-transport-belt", 10 },
             },
             results = {
-                { "belt-balancer", 4 }
+                { "balancer-part", 4 }
             },
             order = "d[balancer]-d[balancer]"
         },
@@ -91,7 +91,7 @@ if mods["boblogistics"] then
                 { "ultimate-transport-belt", 10 },
             },
             results = {
-                { "belt-balancer", 5 }
+                { "balancer-part", 5 }
             },
             order = "d[balancer]-e[balancer]"
         },
