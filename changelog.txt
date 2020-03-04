@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.2.0
+Date: 04.03.2020
+  Bugfix:
+    - Rebuild the whole mod. It has a new, more robust code base now. This fixes a few issues, with tracking balancer and its belts. (This version can have long migration times!)
+---------------------------------------------------------------------------------------------------
 Version: 1.1.8
 Date: 22.02.2020
   Bugfix:
