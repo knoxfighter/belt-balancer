@@ -3,4 +3,5 @@
 cd ..
 dir="$(pwd)"
 base="$(basename ${dir})"
-zip -r  ../${base}.zip . -x misc\* additional_types\* .git\* .idea\* .gitignore
+cd ..
+zip -r  ${base}.zip ${base} -x **misc\* **additional_types\* **.git\* **.idea\* **.gitignore
