@@ -63,11 +63,10 @@ end)
 
 -- only add this command, if `debug` is available and creative-mod is activated
 -- `debug` can be activated, when calling factorio with `--instrument-mod belt-balancer`
-if debug and script.active_mods["creative-mod"] then
-    commands.add_command("belt-balancer-test", "", function(e)
-        test_mod(e.player_index)
-    end)
-end
+-- FIXME this has to be uncommented to use the test command
+--commands.add_command("belt-balancer-test", "", function(e)
+--    test_mod(e.player_index)
+--end)
 
 function built_entity(e)
     ---@type LuaEntity
@@ -171,64 +170,4 @@ script.on_event({ defines.events.on_player_rotated_entity },
     end
 )
 
--- on new savegame and on adding mod to existing save
-script.on_init(function()
-    global.belt_balancer_max_id = 0
-
-    global.new_balancers = {}
-    global.events = {}
-
-    -- Unlock recipes, if technologies already researched
-    for _, force in pairs(game.forces) do
-        if force.technologies["logistics"].researched then
-            force.recipes["belt-balancer-normal-belt"].enabled = true
-        end
-        if force.technologies["logistics-2"].researched then
-            force.recipes["belt-balancer-fast-belt"].enabled = true
-        end
-        if force.technologies["logistics-3"].researched then
-            force.recipes["belt-balancer-express-belt"].enabled = true
-        end
-    end
-end)
-
--- If some mod is changed, so train-stops are not valid anymore ... also reload
-script.on_configuration_changed(
-    function(e)
-        ---@type ModConfigurationChangedData
-        local boblogistics_changes = e.mod_changes["boblogistics"]
-
-        if boblogistics_changes and boblogistics_changes.old_version == nil and boblogistics_changes.new_version and settings.startup["bobmods-logistics-beltoverhaul"].value == true then
-            -- on boblogistics got added!
-            for _, force in pairs(game.forces) do
-                local technologies = force.technologies
-                local recipes = force.recipes
-
-                technologies["belt-balancer-0"].researched = technologies["belt-balancer-1"].researched
-                recipes["belt-balancer-basic-belt"].enabled = technologies["belt-balancer-1"].researched
-            end
-        end
-    end
-)
-
 script.on_load(reregister_on_tick)
-
-commands.add_command("belt-balancer-statistics", "", function(e)
-    local balancer_amount = #global.new_balancers
-    local balancer_part_amount = 0
-    local balancer_input_belt_amount = 0
-    local balancer_output_belt_amount = 0
-
-    for _, balancer in pairs(global.new_balancers) do
-        balancer_part_amount = balancer_part_amount + table_size(balancer.splitter)
-        balancer_input_belt_amount = balancer_input_belt_amount + table_size(balancer.input_belts)
-        balancer_output_belt_amount = balancer_output_belt_amount + table_size(balancer.output_belts)
-    end
-
-    local output = "balancers: " .. balancer_amount ..
-                   "\nbalancer-parts: " .. balancer_part_amount ..
-                   "\nbalancer_input_belts: " .. balancer_input_belt_amount ..
-                   "\nbalancer_output_belts: " .. balancer_output_belt_amount
-    game.get_player(e.player_index).print(output)
-    print(output)
-end)
