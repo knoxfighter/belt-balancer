@@ -135,7 +135,7 @@ function balancer_functions.recalculate_nth_tick(balancer_index)
 
     for _, part in pairs(balancer.parts) do
         local stack_part = global.parts[part]
-        for _, belt in pairs(stack_part.input_belts) do
+        for _, belt in pairs(stack_part.output_belts) do
             local stack_belt = global.belts[belt]
             local belt_speed = stack_belt.entity.prototype.belt_speed
             local ticks_per_tile = 0.25 / belt_speed

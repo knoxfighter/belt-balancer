@@ -921,6 +921,136 @@ function test_mod(player_index)
         create_belt({ current_x, base_y + 7 })
         create_belt({ current_x + 1, base_y + 7 })
         current_x = current_x + 4
+
+        return current_x + 2
+    end
+
+    local function check_different_input_output_speed(current_x, base_y)
+        -- test 1: 4 belts, 3 yellow input, 1 red output
+        create_basic_setup(current_x, base_y)
+        create_basic_setup(current_x + 1, base_y)
+        create_basic_setup(current_x + 2, base_y)
+        create_basic_setup(current_x + 3, base_y, "fast-")
+
+        create_belt({current_x, base_y + 3})
+        create_belt({current_x + 1, base_y + 3})
+        create_belt({current_x + 2, base_y + 3})
+
+        create_part({current_x, base_y + 4})
+        create_part({current_x + 1, base_y + 4})
+        create_part({current_x + 2, base_y + 4})
+        create_part({current_x + 3, base_y + 4})
+
+        create_belt({current_x + 3, base_y + 5}, "fast-")
+        current_x = current_x + 6
+
+        -- test 2: 4 belts, 3 blue input, 1 red output
+        create_basic_setup(current_x, base_y, "express-")
+        create_basic_setup(current_x + 1, base_y, "express-")
+        create_basic_setup(current_x + 2, base_y, "express-")
+        create_basic_setup(current_x + 3, base_y, "fast-")
+
+        create_belt({current_x, base_y + 3}, "express-")
+        create_belt({current_x + 1, base_y + 3}, "express-")
+        create_belt({current_x + 2, base_y + 3}, "express-")
+
+        create_part({current_x, base_y + 4})
+        create_part({current_x + 1, base_y + 4})
+        create_part({current_x + 2, base_y + 4})
+        create_part({current_x + 3, base_y + 4})
+
+        create_belt({current_x + 3, base_y + 5}, "fast-")
+        current_x = current_x + 6
+
+        -- test 3: 4 belts, 3 yellow input, 1 blue output
+        create_basic_setup(current_x, base_y)
+        create_basic_setup(current_x + 1, base_y)
+        create_basic_setup(current_x + 2, base_y)
+        create_basic_setup(current_x + 3, base_y, "express-")
+
+        create_belt({current_x, base_y + 3})
+        create_belt({current_x + 1, base_y + 3})
+        create_belt({current_x + 2, base_y + 3})
+
+        create_part({current_x, base_y + 4})
+        create_part({current_x + 1, base_y + 4})
+        create_part({current_x + 2, base_y + 4})
+        create_part({current_x + 3, base_y + 4})
+
+        create_belt({current_x + 3, base_y + 5}, "express-")
+        current_x = current_x + 6
+
+        -- test 4: 4 belts, 3 red input, 1 blue output
+        create_basic_setup(current_x, base_y, "fast-")
+        create_basic_setup(current_x + 1, base_y, "fast-")
+        create_basic_setup(current_x + 2, base_y, "fast-")
+        create_basic_setup(current_x + 3, base_y, "express-")
+
+        create_belt({current_x, base_y + 3}, "fast-")
+        create_belt({current_x + 1, base_y + 3}, "fast-")
+        create_belt({current_x + 2, base_y + 3}, "fast-")
+
+        create_part({current_x, base_y + 4})
+        create_part({current_x + 1, base_y + 4})
+        create_part({current_x + 2, base_y + 4})
+        create_part({current_x + 3, base_y + 4})
+
+        create_belt({current_x + 3, base_y + 5}, "express-")
+        current_x = current_x + 6
+
+        -- test 5: 4 belts, 3 red input, 1 yellow output
+        create_basic_setup(current_x, base_y, "fast-")
+        create_basic_setup(current_x + 1, base_y, "fast-")
+        create_basic_setup(current_x + 2, base_y, "fast-")
+        create_basic_setup(current_x + 3, base_y)
+
+        create_belt({current_x, base_y + 3}, "fast-")
+        create_belt({current_x + 1, base_y + 3}, "fast-")
+        create_belt({current_x + 2, base_y + 3}, "fast-")
+
+        create_part({current_x, base_y + 4})
+        create_part({current_x + 1, base_y + 4})
+        create_part({current_x + 2, base_y + 4})
+        create_part({current_x + 3, base_y + 4})
+
+        create_belt({current_x + 3, base_y + 5})
+        current_x = current_x + 6
+
+        -- test 6: 4 belts, 3 blue input, 1 yellow output
+        create_basic_setup(current_x, base_y, "express-")
+        create_basic_setup(current_x + 1, base_y, "express-")
+        create_basic_setup(current_x + 2, base_y, "express-")
+        create_basic_setup(current_x + 3, base_y)
+
+        create_belt({current_x, base_y + 3}, "express-")
+        create_belt({current_x + 1, base_y + 3}, "express-")
+        create_belt({current_x + 2, base_y + 3}, "express-")
+
+        create_part({current_x, base_y + 4})
+        create_part({current_x + 1, base_y + 4})
+        create_part({current_x + 2, base_y + 4})
+        create_part({current_x + 3, base_y + 4})
+
+        create_belt({current_x + 3, base_y + 5})
+        current_x = current_x + 6
+
+        -- test 7: 4 belts, 3 blue input, 1 red output
+        create_basic_setup(current_x, base_y, "express-")
+        create_basic_setup(current_x + 1, base_y, "express-")
+        create_basic_setup(current_x + 2, base_y, "express-")
+        create_basic_setup(current_x + 3, base_y, "fast-")
+
+        create_belt({current_x, base_y + 3}, "express-")
+        create_belt({current_x + 1, base_y + 3}, "express-")
+        create_belt({current_x + 2, base_y + 3}, "express-")
+
+        create_part({current_x, base_y + 4})
+        create_part({current_x + 1, base_y + 4})
+        create_part({current_x + 2, base_y + 4})
+        create_part({current_x + 3, base_y + 4})
+
+        create_belt({current_x + 3, base_y + 5}, "fast-")
+        current_x = current_x + 6
     end
 
     local current_x = 0
@@ -961,5 +1091,7 @@ function test_mod(player_index)
     check_basic_usage(current_x, base_y)
 
     base_y = base_y + 15
-    check_underground_skip(current_x, base_y)
+    local cont_current_x = check_underground_skip(current_x, base_y)
+
+    check_different_input_output_speed(cont_current_x or current_x, base_y)
 end
