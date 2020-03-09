@@ -21,7 +21,7 @@ function belt_functions.get_or_create(belt_entity)
 
     -- only run over 2 lanes, if underground-belt
     local belt_count = nil
-    if belt_entity.type == "underground" then
+    if belt_entity.type == "underground-belt" then
         belt_count = 2
     else
         belt_count = belt_entity.get_max_transport_line_index()
@@ -174,6 +174,14 @@ end
 function belt_functions.built_belt(belt)
     -- get nearby balancer
     local into_part, from_part = belt_functions.get_input_output_parts(belt)
+
+    if belt.type == "underground-belt" then
+        if belt.belt_to_ground_type == "input" then
+            into_part = nil
+        elseif belt.belt_to_ground_type == "output" then
+            from_part = nil
+        end
+    end
 
     if into_part then
         local stack_belt = belt_functions.get_or_create(belt)

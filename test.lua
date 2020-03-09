@@ -64,10 +64,7 @@ function test_mod(player_index)
         }
     end
 
-    ---@overload fun(position:Position)
-    ---@param position Position
-    ---@param belt_prefix string
-    local function create_underground_belt(position, belt_prefix)
+    local function create_underground_belt_input(position, belt_prefix)
         belt_prefix = belt_prefix or ""
 
         surface.create_entity {
@@ -78,16 +75,29 @@ function test_mod(player_index)
             raise_built = true,
             type = "input"
         }
+    end
 
-        local one_lower_pos = { x = position[1], y = position[2] + 1 }
+    local function create_underground_belt_output(position, belt_prefix)
+        belt_prefix = belt_prefix or ""
+
         surface.create_entity {
             name = belt_prefix .. "underground-belt",
-            position = one_lower_pos,
+            position = position,
             direction = defines.direction.south,
             force = player.force,
             raise_built = true,
             type = "output"
         }
+    end
+
+    ---@overload fun(position:Position)
+    ---@param position Position
+    ---@param belt_prefix string
+    local function create_underground_belt(position, belt_prefix)
+        create_underground_belt_input(position, belt_prefix)
+
+        local one_lower_pos = { x = position[1], y = position[2] + 1 }
+        create_underground_belt_output(one_lower_pos, belt_prefix)
     end
 
     ---@overload fun(position:Position)
@@ -874,6 +884,45 @@ function test_mod(player_index)
         current_x = current_x + 5
     end
 
+    local function check_underground_skip(current_x, base_y)
+        -- test 1: 1 underground, test if input is connected
+        create_extended_setup(current_x, base_y)
+        create_extended_setup(current_x + 1, base_y)
+
+        create_belt({ current_x, base_y + 3 })
+
+        create_underground_belt_input({ current_x, base_y + 4 })
+        create_belt({ current_x + 1, base_y + 4 })
+
+        create_part({ current_x, base_y + 5 })
+        create_part({ current_x + 1, base_y + 5 })
+
+        create_belt({ current_x + 1, base_y + 6 })
+
+        create_underground_belt_output({ current_x, base_y + 7 })
+        create_belt({ current_x + 1, base_y + 7 })
+        current_x = current_x + 4
+
+        -- test 2: 1 underground, test if output is connected
+        create_extended_setup(current_x, base_y)
+        create_extended_setup(current_x + 1, base_y)
+
+        --create_underground_belt_input({ current_x, base_y + 3 })
+        create_belt({ current_x + 1, base_y + 3 })
+
+        create_belt({ current_x + 1, base_y + 4 })
+
+        create_part({ current_x, base_y + 5 })
+        create_part({ current_x + 1, base_y + 5 })
+
+        create_underground_belt_output({ current_x, base_y + 6 })
+        create_belt({ current_x + 1, base_y + 6 })
+
+        create_belt({ current_x, base_y + 7 })
+        create_belt({ current_x + 1, base_y + 7 })
+        current_x = current_x + 4
+    end
+
     local current_x = 0
     local base_y = 0
     local new_current_x = check_built(current_x, base_y)
@@ -910,4 +959,7 @@ function test_mod(player_index)
 
     base_y = base_y + 15
     check_basic_usage(current_x, base_y)
+
+    base_y = base_y + 15
+    check_underground_skip(current_x, base_y)
 end
