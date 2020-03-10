@@ -20,7 +20,7 @@ function belt_functions.get_or_create(belt_entity)
     belt.input_balancer = {}
 
     -- only run over 2 lanes, if underground-belt
-    local belt_count = nil
+    local belt_count
     if belt_entity.type == "underground-belt" then
         belt_count = 2
     else

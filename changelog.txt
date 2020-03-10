@@ -4,6 +4,7 @@ Date: xx.xx.xxxx
   Bugfix:
     - Fixed that underground-belts are connected, even if they are not pointing to a balancer-part.
     - Output-belts are now compressed, when input-belts are slower than the output-belts.
+    - Output-belts are now compressed, when they are faster than 120 items/min (new max speed: 240 items/min)
 ---------------------------------------------------------------------------------------------------
 Version: 2.1.0
 Date: 04.03.2020

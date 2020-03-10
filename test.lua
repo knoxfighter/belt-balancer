@@ -1054,6 +1054,20 @@ function test_mod(player_index)
     end
 
     local function check_bobs_belts(current_x, base_y)
+        -- test 0: 2 belts, 2 green
+        create_basic_setup(current_x, base_y, "ultimate-")
+        create_basic_setup(current_x + 1, base_y, "ultimate-")
+
+        create_belt({ current_x, base_y + 3 }, "ultimate-")
+        create_belt({ current_x + 1, base_y + 3 }, "ultimate-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+
+        create_belt({ current_x, base_y + 5 }, "ultimate-")
+        create_belt({ current_x + 1, base_y + 5 }, "ultimate-")
+        current_x = current_x + 4
+
         -- test 1: 4 belts, 3  yellow, 1 purple
         create_basic_setup(current_x, base_y, "fast-")
         create_basic_setup(current_x + 1, base_y, "fast-")
