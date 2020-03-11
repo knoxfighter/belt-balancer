@@ -135,7 +135,7 @@ function balancer_functions.recalculate_nth_tick(balancer_index)
 
     for _, part in pairs(balancer.parts) do
         local stack_part = global.parts[part]
-        for _, belt in pairs(stack_part.input_belts) do
+        for _, belt in pairs(stack_part.output_belts) do
             local stack_belt = global.belts[belt]
             local belt_speed = stack_belt.entity.prototype.belt_speed
             local ticks_per_tile = 0.25 / belt_speed
@@ -181,12 +181,10 @@ function balancer_functions.run(balancer_index)
     local balancer = global.balancer[balancer_index]
 
     if table_size(balancer.input_lanes) > 0 and table_size(balancer.output_lanes) > 0 then
-        local last_one_failed = 0
-
         -- get how many items are needed per lane
         local buffer_count = #balancer.buffer
         local output_lane_count = table_size(balancer.output_lanes)
-        local gather_amount = output_lane_count - buffer_count
+        local gather_amount = (output_lane_count * 2) - buffer_count
 
         local next_lanes = table.deepcopy(balancer.input_lanes)
 
@@ -227,19 +225,25 @@ function balancer_functions.run(balancer_index)
             end
         end
 
-        for _, lane_index in pairs(output_lanes_sorted) do
-            if #balancer.buffer > 0 then
-                local lane = global.lanes[lane_index]
-                if lane.can_insert_at_back() then
-                    if lane.insert_at_back(balancer.buffer[1]) then
+        -- put items onto the belt
+        local function put_on_belts(lanes)
+            local second_iteration = {}
+            for _, lane_index in pairs(lanes) do
+                if #balancer.buffer > 0 then
+                    local lane = global.lanes[lane_index]
+                    if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
                         table.remove(balancer.buffer, 1)
                         balancer.last_success = lane_index
+                        table.insert(second_iteration, lane_index)
                     end
+                else
+                    break
                 end
-            else
-                break
             end
+            return second_iteration
         end
+
+        put_on_belts(put_on_belts(output_lanes_sorted))
     end
 end
 

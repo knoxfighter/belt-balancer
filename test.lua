@@ -64,10 +64,7 @@ function test_mod(player_index)
         }
     end
 
-    ---@overload fun(position:Position)
-    ---@param position Position
-    ---@param belt_prefix string
-    local function create_underground_belt(position, belt_prefix)
+    local function create_underground_belt_input(position, belt_prefix)
         belt_prefix = belt_prefix or ""
 
         surface.create_entity {
@@ -78,16 +75,29 @@ function test_mod(player_index)
             raise_built = true,
             type = "input"
         }
+    end
 
-        local one_lower_pos = { x = position[1], y = position[2] + 1 }
+    local function create_underground_belt_output(position, belt_prefix)
+        belt_prefix = belt_prefix or ""
+
         surface.create_entity {
             name = belt_prefix .. "underground-belt",
-            position = one_lower_pos,
+            position = position,
             direction = defines.direction.south,
             force = player.force,
             raise_built = true,
             type = "output"
         }
+    end
+
+    ---@overload fun(position:Position)
+    ---@param position Position
+    ---@param belt_prefix string
+    local function create_underground_belt(position, belt_prefix)
+        create_underground_belt_input(position, belt_prefix)
+
+        local one_lower_pos = { x = position[1], y = position[2] + 1 }
+        create_underground_belt_output(one_lower_pos, belt_prefix)
     end
 
     ---@overload fun(position:Position)
@@ -874,6 +884,265 @@ function test_mod(player_index)
         current_x = current_x + 5
     end
 
+    local function check_underground_skip(current_x, base_y)
+        -- test 1: 1 underground, test if input is connected
+        create_extended_setup(current_x, base_y)
+        create_extended_setup(current_x + 1, base_y)
+
+        create_belt({ current_x, base_y + 3 })
+
+        create_underground_belt_input({ current_x, base_y + 4 })
+        create_belt({ current_x + 1, base_y + 4 })
+
+        create_part({ current_x, base_y + 5 })
+        create_part({ current_x + 1, base_y + 5 })
+
+        create_belt({ current_x + 1, base_y + 6 })
+
+        create_underground_belt_output({ current_x, base_y + 7 })
+        create_belt({ current_x + 1, base_y + 7 })
+        current_x = current_x + 4
+
+        -- test 2: 1 underground, test if output is connected
+        create_extended_setup(current_x, base_y)
+        create_extended_setup(current_x + 1, base_y)
+
+        --create_underground_belt_input({ current_x, base_y + 3 })
+        create_belt({ current_x + 1, base_y + 3 })
+
+        create_belt({ current_x + 1, base_y + 4 })
+
+        create_part({ current_x, base_y + 5 })
+        create_part({ current_x + 1, base_y + 5 })
+
+        create_underground_belt_output({ current_x, base_y + 6 })
+        create_belt({ current_x + 1, base_y + 6 })
+
+        create_belt({ current_x, base_y + 7 })
+        create_belt({ current_x + 1, base_y + 7 })
+        current_x = current_x + 4
+
+        return current_x + 2
+    end
+
+    local function check_different_input_output_speed(current_x, base_y)
+        -- test 1: 4 belts, 3 yellow input, 1 red output
+        create_basic_setup(current_x, base_y)
+        create_basic_setup(current_x + 1, base_y)
+        create_basic_setup(current_x + 2, base_y)
+        create_basic_setup(current_x + 3, base_y, "fast-")
+
+        create_belt({ current_x, base_y + 3 })
+        create_belt({ current_x + 1, base_y + 3 })
+        create_belt({ current_x + 2, base_y + 3 })
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 }, "fast-")
+        current_x = current_x + 6
+
+        -- test 2: 4 belts, 3 blue input, 1 red output
+        create_basic_setup(current_x, base_y, "express-")
+        create_basic_setup(current_x + 1, base_y, "express-")
+        create_basic_setup(current_x + 2, base_y, "express-")
+        create_basic_setup(current_x + 3, base_y, "fast-")
+
+        create_belt({ current_x, base_y + 3 }, "express-")
+        create_belt({ current_x + 1, base_y + 3 }, "express-")
+        create_belt({ current_x + 2, base_y + 3 }, "express-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 }, "fast-")
+        current_x = current_x + 6
+
+        -- test 3: 4 belts, 3 yellow input, 1 blue output
+        create_basic_setup(current_x, base_y)
+        create_basic_setup(current_x + 1, base_y)
+        create_basic_setup(current_x + 2, base_y)
+        create_basic_setup(current_x + 3, base_y, "express-")
+
+        create_belt({ current_x, base_y + 3 })
+        create_belt({ current_x + 1, base_y + 3 })
+        create_belt({ current_x + 2, base_y + 3 })
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 }, "express-")
+        current_x = current_x + 6
+
+        -- test 4: 4 belts, 3 red input, 1 blue output
+        create_basic_setup(current_x, base_y, "fast-")
+        create_basic_setup(current_x + 1, base_y, "fast-")
+        create_basic_setup(current_x + 2, base_y, "fast-")
+        create_basic_setup(current_x + 3, base_y, "express-")
+
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_belt({ current_x + 1, base_y + 3 }, "fast-")
+        create_belt({ current_x + 2, base_y + 3 }, "fast-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 }, "express-")
+        current_x = current_x + 6
+
+        -- test 5: 4 belts, 3 red input, 1 yellow output
+        create_basic_setup(current_x, base_y, "fast-")
+        create_basic_setup(current_x + 1, base_y, "fast-")
+        create_basic_setup(current_x + 2, base_y, "fast-")
+        create_basic_setup(current_x + 3, base_y)
+
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_belt({ current_x + 1, base_y + 3 }, "fast-")
+        create_belt({ current_x + 2, base_y + 3 }, "fast-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 })
+        current_x = current_x + 6
+
+        -- test 6: 4 belts, 3 blue input, 1 yellow output
+        create_basic_setup(current_x, base_y, "express-")
+        create_basic_setup(current_x + 1, base_y, "express-")
+        create_basic_setup(current_x + 2, base_y, "express-")
+        create_basic_setup(current_x + 3, base_y)
+
+        create_belt({ current_x, base_y + 3 }, "express-")
+        create_belt({ current_x + 1, base_y + 3 }, "express-")
+        create_belt({ current_x + 2, base_y + 3 }, "express-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 })
+        current_x = current_x + 6
+
+        -- test 7: 4 belts, 3 blue input, 1 red output
+        create_basic_setup(current_x, base_y, "express-")
+        create_basic_setup(current_x + 1, base_y, "express-")
+        create_basic_setup(current_x + 2, base_y, "express-")
+        create_basic_setup(current_x + 3, base_y, "fast-")
+
+        create_belt({ current_x, base_y + 3 }, "express-")
+        create_belt({ current_x + 1, base_y + 3 }, "express-")
+        create_belt({ current_x + 2, base_y + 3 }, "express-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 }, "fast-")
+        current_x = current_x + 6
+    end
+
+    local function check_bobs_belts(current_x, base_y)
+        -- test 0: 2 belts, 2 green
+        create_basic_setup(current_x, base_y, "ultimate-")
+        create_basic_setup(current_x + 1, base_y, "ultimate-")
+
+        create_belt({ current_x, base_y + 3 }, "ultimate-")
+        create_belt({ current_x + 1, base_y + 3 }, "ultimate-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+
+        create_belt({ current_x, base_y + 5 }, "ultimate-")
+        create_belt({ current_x + 1, base_y + 5 }, "ultimate-")
+        current_x = current_x + 4
+
+        -- test 1: 4 belts, 3  yellow, 1 purple
+        create_basic_setup(current_x, base_y, "fast-")
+        create_basic_setup(current_x + 1, base_y, "fast-")
+        create_basic_setup(current_x + 2, base_y, "fast-")
+        create_basic_setup(current_x + 3, base_y, "turbo-")
+
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_belt({ current_x + 1, base_y + 3 }, "fast-")
+        create_belt({ current_x + 2, base_y + 3 }, "fast-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 }, "turbo-")
+        current_x = current_x + 6
+
+        -- test 2: 4 belts, 3 yellow, 1 green
+        create_basic_setup(current_x, base_y, "fast-")
+        create_basic_setup(current_x + 1, base_y, "fast-")
+        create_basic_setup(current_x + 2, base_y, "fast-")
+        create_basic_setup(current_x + 3, base_y, "ultimate-")
+
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_belt({ current_x + 1, base_y + 3 }, "fast-")
+        create_belt({ current_x + 2, base_y + 3 }, "fast-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 }, "ultimate-")
+        current_x = current_x + 6
+
+        -- test 3: 4 belts, 1 green, 3 yellow
+        create_basic_setup(current_x, base_y, "ultimate-")
+        create_basic_setup(current_x + 1, base_y)
+        create_basic_setup(current_x + 2, base_y)
+        create_basic_setup(current_x + 3, base_y)
+
+        create_belt({ current_x, base_y + 3 }, "ultimate-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 1, base_y + 5 })
+        create_belt({ current_x + 2, base_y + 5 })
+        create_belt({ current_x + 3, base_y + 5 })
+        current_x = current_x + 6
+
+        -- test 4: 4 belts, 3 grey, 1 yellow
+        create_basic_setup(current_x, base_y, "basic-")
+        create_basic_setup(current_x + 1, base_y, "basic-")
+        create_basic_setup(current_x + 2, base_y, "basic-")
+        create_basic_setup(current_x + 3, base_y)
+
+        create_belt({ current_x, base_y + 3 }, "basic-")
+        create_belt({ current_x + 1, base_y + 3 }, "basic-")
+        create_belt({ current_x + 2, base_y + 3 }, "basic-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 })
+        current_x = current_x + 6
+
+        return current_x
+    end
+
     local current_x = 0
     local base_y = 0
     local new_current_x = check_built(current_x, base_y)
@@ -906,8 +1175,19 @@ function test_mod(player_index)
     new_current_x = check_rotation(current_x, base_y)
 
     base_y = base_y + 15
-    new_current_x = check_buffer(current_x, base_y)
+    check_buffer(current_x, base_y)
 
     base_y = base_y + 15
     check_basic_usage(current_x, base_y)
+
+    base_y = base_y + 15
+    local cont_current_x = check_underground_skip(current_x, base_y)
+
+    check_different_input_output_speed(cont_current_x or current_x, base_y)
+
+    current_x = new_current_x
+    base_y = 0
+    if script.active_mods["boblogistics"] then
+        check_bobs_belts(current_x, base_y)
+    end
 end
