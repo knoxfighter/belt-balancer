@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
-Version: Unreleased
-Date: xx.xx.xxxx
+Version: 1.2.1/2.1.1
+Date: 11.03.2020
   Bugfix:
     - Fixed that underground-belts are connected, even if they are not pointing to a balancer-part.
     - Output-belts are now compressed, when input-belts are slower than the output-belts.
