@@ -276,14 +276,14 @@ end
 ---@param balancer Balancer
 ---@param drop_to Item_drop_param
 function balancer_functions.empty_buffer(balancer, drop_to)
-    if drop_to.buffer then
+    if drop_to.buffer and drop_to.buffer.valid then
         for _, item in pairs(balancer.buffer) do
             drop_to.buffer.insert(item)
         end
     else
         -- drop items on ground
         for _, item in pairs(balancer.buffer) do
-            drop_to.surface.spill_item_stack(drop_to.position, item)
+            drop_to.surface.spill_item_stack(drop_to.position, item, false, drop_to.force)
         end
     end
 end

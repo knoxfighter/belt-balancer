@@ -172,3 +172,6 @@ Item_drop_param.surface = nil
 ---@type Position
 Item_drop_param.position = nil
 
+---@type LuaForce
+Item_drop_param.force = nil
+

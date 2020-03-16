@@ -237,7 +237,8 @@ function part_functions.remove(entity, buffer)
     local drop_to = {
         buffer = buffer,
         position = entity.position,
-        surface = entity.surface
+        surface = entity.surface,
+        force = entity.force
     }
 
     -- check if balancer is valid

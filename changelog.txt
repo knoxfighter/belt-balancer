@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: x.x.x
+Date: xx.xx.xxxx
+  Feature:
+    - When items are dropped to ground, mark them for deconstruction/pickup.
+  Bugfix:
+    - When LuaInventory to put items to, is invalid, drop them on the ground.
+---------------------------------------------------------------------------------------------------
 Version: 1.2.1/2.1.1
 Date: 11.03.2020
   Bugfix:
@@ -6,18 +13,11 @@ Date: 11.03.2020
     - Output-belts are now compressed, when input-belts are slower than the output-belts.
     - Output-belts are now compressed, when they are faster than 120 items/min (new max speed: 240 items/min)
 ---------------------------------------------------------------------------------------------------
-Version: 2.1.0
+Version: 1.2.0/2.1.0
 Date: 04.03.2020
   Bugfix:
     - Rebuild the whole mod. It has a new, more robust code base now. This fixes a few issues, with tracking balancer and its belts. (This version can have long migration times!)
-  Added:
-    - Polish Translation
----------------------------------------------------------------------------------------------------
-Version: 1.2.0
-Date: 04.03.2020
-  Bugfix:
-    - Rebuild the whole mod. It has a new, more robust code base now. This fixes a few issues, with tracking balancer and its belts. (This version can have long migration times!)
-  Added:
+  Feature:
     - Polish Translation
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.8
@@ -55,7 +55,7 @@ Date: 21.01.2020
 ---------------------------------------------------------------------------------------------------
 Version: 1.1.6
 Date: 16.01.2020
-  Added:
+  Feature:
     - Command to print out belt-balancer statistics (/belt-balancer-statistics)
   Bugfix:
     - fixed script mismatch, when adding mod to an existing save
