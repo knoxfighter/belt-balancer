@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
-Version: x.x.x
-Date: xx.xx.xxxx
+Version: 1.2.2/2.1.2
+Date: 17.03.2020
   Feature:
     - When items are dropped to ground, mark them for deconstruction/pickup.
   Bugfix:
