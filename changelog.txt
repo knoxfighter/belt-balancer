@@ -5,6 +5,7 @@ Date: xx.xx.xxxx
     - When items are dropped to ground, mark them for deconstruction/pickup.
   Bugfix:
     - When LuaInventory to put items to, is invalid, drop them on the ground.
+    - Fixed crash, when Parts, with adjacent splitters, are removed.
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.1/2.1.1
 Date: 11.03.2020
