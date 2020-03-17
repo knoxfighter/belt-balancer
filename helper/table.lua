@@ -6,3 +6,12 @@ function remove_from_table(_table, remove_value)
         end
     end
 end
+
+function table.contains(table, element)
+    for _, table_element in pairs(table) do
+        if table_element == element then
+            return true
+        end
+    end
+    return false
+end

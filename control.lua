@@ -67,6 +67,19 @@ end)
 --commands.add_command("belt-balancer-test", "", function(e)
 --    test_mod(e.player_index)
 --end)
+--commands.add_command("belt-balancer-test-logic", "", function(e)
+--    test_mod_logic(e.player_index)
+--end)
+--commands.add_command("belt-balancer-print", "", function(e)
+--    print("Balancer:")
+--    print(serpent.block(global.balancer))
+--    print("Parts:")
+--    print(serpent.block(global.parts))
+--    print("Belts:")
+--    print(serpent.block(global.belts))
+--    print("Lanes:")
+--    print(serpent.block(global.lanes))
+--end)
 
 function built_entity(e)
     ---@type LuaEntity
@@ -169,5 +182,3 @@ script.on_event({ defines.events.on_player_rotated_entity },
         end
     end
 )
-
-script.on_load(reregister_on_tick)

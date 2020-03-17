@@ -1143,6 +1143,57 @@ function test_mod(player_index)
         return current_x
     end
 
+    local function check_complete_removal(current_x, base_y)
+        -- test 1: 2 belts, remove all parts
+        create_basic_setup(current_x, base_y)
+        create_basic_setup(current_x + 1, base_y)
+
+        create_belt({ current_x, base_y + 3 })
+        create_belt({ current_x + 1, base_y + 3 })
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+
+        create_belt({ current_x, base_y + 5 })
+        create_belt({ current_x + 1, base_y + 5 })
+
+        destroy_entity({ current_x, base_y + 4 })
+        destroy_entity({ current_x + 1, base_y + 4 })
+        current_x = current_x + 5
+
+        -- test 2: 2 underground, remove all parts
+        create_extended_setup(current_x, base_y)
+        create_extended_setup(current_x + 1, base_y)
+
+        create_underground_belt({ current_x, base_y + 3 })
+        create_underground_belt({ current_x + 1, base_y + 3 })
+
+        create_part({ current_x, base_y + 5 })
+        create_part({ current_x + 1, base_y + 5 })
+
+        create_underground_belt({ current_x, base_y + 6 })
+        create_underground_belt({ current_x + 1, base_y + 6 })
+
+        destroy_entity({ current_x, base_y + 5 })
+        destroy_entity({ current_x + 1, base_y + 5 })
+        current_x = current_x + 5
+
+        -- test 3: 1 splitter, remove all parts
+        create_basic_setup(current_x, base_y)
+        create_basic_setup(current_x + 1, base_y)
+
+        create_splitter({ current_x + 1, base_y + 3 })
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+
+        create_splitter({ current_x + 1, base_y + 5 })
+
+        destroy_entity({ current_x, base_y + 4 })
+        destroy_entity({ current_x + 1, base_y + 4 })
+        current_x = current_x + 8
+    end
+
     local current_x = 0
     local base_y = 0
     local new_current_x = check_built(current_x, base_y)
@@ -1187,7 +1238,395 @@ function test_mod(player_index)
 
     current_x = new_current_x
     base_y = 0
-    if script.active_mods["boblogistics"] then
-        check_bobs_belts(current_x, base_y)
+    check_complete_removal(current_x, base_y)
+
+    base_y = base_y + 15
+    -- FIXME this has to be uncommented to also test boblogistics stuff
+    --check_bobs_belts(current_x, base_y)
+end
+
+function test_mod_logic(player_index)
+    local player = game.get_player(player_index)
+    local surface = player.surface
+
+    local function clear_area(clear_area)
+        local real_area = { { clear_area[1][1] - 1, clear_area[1][2] - 1 }, { clear_area[2][1] + 2, clear_area[2][2] + 2 } }
+        local clear_entities = surface.find_entities_filtered {
+            area = real_area,
+            type = {
+                "character",
+                "splitter",
+                "transport-belt",
+                "underground-belt"
+            },
+            name = {
+                "creative-mod_item-source",
+                "creative-mod_item-void"
+            },
+            invert = true
+        }
+        for _, clear_entity in pairs(clear_entities) do
+
+            if not clear_entity.destroy() then
+                clear_entity.die(nil)
+            end
+        end
+
+        surface.destroy_decoratives { area = real_area }
+    end
+
+    ---@param position Position
+    local function create_item_source(position)
+        surface.create_entity {
+            name = "creative-mod_item-source",
+            position = position,
+            force = player.force,
+            filters = { { index = 1, name = "iron-plate" }, { index = 2, name = "iron-ore" } },
+            raise_built = true
+        }
+    end
+
+    ---@param position Position
+    local function create_item_void(position)
+        local created_item_source = surface.create_entity {
+            name = "creative-mod_item-void",
+            position = position,
+            force = player.force,
+            raise_built = true
+        }
+    end
+
+    ---@overload fun(position:Position)
+    ---@param position Position
+    ---@param belt_prefix string
+    local function create_belt(position, belt_prefix)
+        belt_prefix = belt_prefix or ""
+
+        surface.create_entity {
+            name = belt_prefix .. "transport-belt",
+            position = position,
+            direction = defines.direction.south,
+            force = player.force,
+            raise_built = true
+        }
+    end
+
+    local function create_underground_belt_input(position, belt_prefix)
+        belt_prefix = belt_prefix or ""
+
+        surface.create_entity {
+            name = belt_prefix .. "underground-belt",
+            position = position,
+            direction = defines.direction.south,
+            force = player.force,
+            raise_built = true,
+            type = "input"
+        }
+    end
+
+    local function create_underground_belt_output(position, belt_prefix)
+        belt_prefix = belt_prefix or ""
+
+        surface.create_entity {
+            name = belt_prefix .. "underground-belt",
+            position = position,
+            direction = defines.direction.south,
+            force = player.force,
+            raise_built = true,
+            type = "output"
+        }
+    end
+
+    ---@overload fun(position:Position)
+    ---@param position Position
+    ---@param belt_prefix string
+    local function create_underground_belt(position, belt_prefix)
+        create_underground_belt_input(position, belt_prefix)
+
+        local one_lower_pos = { x = position[1], y = position[2] + 1 }
+        create_underground_belt_output(one_lower_pos, belt_prefix)
+    end
+
+    ---@overload fun(position:Position)
+    ---@param position Position
+    ---@param belt_prefix string
+    local function create_splitter(position, belt_prefix)
+        belt_prefix = belt_prefix or ""
+
+        surface.create_entity {
+            name = belt_prefix .. "splitter",
+            position = position,
+            direction = defines.direction.south,
+            force = player.force,
+            raise_built = true
+        }
+    end
+
+    ---@param position Position
+    ---@return LuaEntity created entity
+    local function create_part(position)
+        return surface.create_entity {
+            name = "balancer-part",
+            position = position,
+            direction = defines.direction.south,
+            force = player.force,
+            raise_built = true
+        }
+    end
+
+    local function destroy_entity(position)
+        local entities = surface.find_entities({ position, { position[1] + 1, position[2] + 1 } })
+        for _, entity in pairs(entities) do
+            entity.destroy({ raise_destroy = true })
+        end
+    end
+
+    ---setup wih part, but without 3--5
+    ---@param x number
+    ---@param base_y number
+    ---@param belt_prefix string
+    local function create_setup(x, base_y, belt_prefix)
+        clear_area({ { x, base_y }, { x, base_y + 8 } })
+        create_item_source({ x, base_y })
+        create_belt({ x, base_y + 1 }, belt_prefix)
+        create_belt({ x, base_y + 2 }, belt_prefix)
+        create_belt({ x, base_y + 6 }, belt_prefix)
+        create_belt({ x, base_y + 7 }, belt_prefix)
+        create_item_void({ x, base_y + 8 })
+    end
+
+    ---setup wih part, but without 3-4--6-7
+    ---@param x number
+    ---@param base_y number
+    ---@param belt_prefix string
+    local function create_extended_setup(x, base_y, belt_prefix)
+        clear_area({ { x, base_y }, { x, base_y + 11 } })
+        create_item_source({ x, base_y })
+        create_belt({ x, base_y + 1 }, belt_prefix)
+        create_belt({ x, base_y + 2 }, belt_prefix)
+        create_belt({ x, base_y + 8 }, belt_prefix)
+        create_belt({ x, base_y + 9 }, belt_prefix)
+        create_item_void({ x, base_y + 10 })
+    end
+
+    ---@return boolean true if everything is clear!
+    local function is_clear()
+        return table_size(global.balancer) == 0 and table_size(global.parts)
+            and table_size(global.belts) and table_size(global.lanes)
+    end
+
+    local function print_all()
+        print("Balancer:")
+        print(serpent.block(global.balancer))
+        print("Parts:")
+        print(serpent.block(global.parts))
+        print("Belts:")
+        print(serpent.block(global.belts))
+        print("Lanes:")
+        print(serpent.block(global.lanes))
+    end
+
+    local current_x = 0
+    local base_y = 0
+
+    -- test 1.1: 1 belt
+    print("test 1.1")
+    create_setup(current_x, base_y)
+    create_belt({ current_x, base_y + 3 })
+    create_part({ current_x, base_y + 4 })
+    create_belt({ current_x, base_y + 5 })
+    destroy_entity({ current_x, base_y + 4 })
+    current_x = current_x + 2
+
+    if not is_clear() then
+        print("!!Error in test 1.1!!")
+        print_all()
+        return
+    end
+
+    -- test 1.2: 1
+    print("test 1.2")
+    create_extended_setup(current_x, base_y)
+    create_underground_belt({ current_x, base_y + 3 })
+    create_part({ current_x, base_y + 5 })
+    create_underground_belt({ current_x, base_y + 6 })
+    destroy_entity({ current_x, base_y + 5 })
+    current_x = current_x + 2
+
+    if not is_clear() then
+        print("!!Error in test 1.2!!")
+        print_all()
+        return
+    end
+
+    -- test 1.3: 1 splitter
+    print("test 1.3")
+    current_x = current_x + 1
+    create_setup(current_x, base_y)
+    create_splitter({ current_x, base_y + 3 })
+    create_part({ current_x, base_y + 4 })
+    create_splitter({ current_x, base_y + 5 })
+    destroy_entity({ current_x, base_y + 4 })
+    current_x = current_x + 4
+
+    if not is_clear() then
+        print("!!Error in test 1.3!!")
+        print_all()
+        return
+    end
+
+    -- test 2.1: 2 belts
+    print("test 2.1")
+    create_setup(current_x, base_y)
+    create_setup(current_x + 1, base_y)
+
+    create_belt({ current_x, base_y + 3 })
+    create_belt({ current_x + 1, base_y + 3 })
+
+    create_part({ current_x, base_y + 4 })
+    create_part({ current_x + 1, base_y + 4 })
+
+    create_belt({ current_x, base_y + 5 })
+    create_belt({ current_x + 1, base_y + 5 })
+
+    destroy_entity({ current_x, base_y + 4 })
+    destroy_entity({ current_x + 1, base_y + 4 })
+    current_x = current_x + 4
+
+    if not is_clear() then
+        print("!!Error in test 2.1!!")
+        print_all()
+        return
+    end
+
+    -- test 2.2: 2 underground
+    print("test 2.2")
+    create_extended_setup(current_x, base_y)
+    create_extended_setup(current_x + 1, base_y)
+
+    create_underground_belt({ current_x, base_y + 3 })
+    create_underground_belt({ current_x + 1, base_y + 3 })
+
+    create_part({ current_x, base_y + 5 })
+    create_part({ current_x + 1, base_y + 5 })
+
+    create_underground_belt({ current_x, base_y + 6 })
+    create_underground_belt({ current_x + 1, base_y + 6 })
+
+    destroy_entity({ current_x, base_y + 5 })
+    destroy_entity({ current_x + 1, base_y + 5 })
+    current_x = current_x + 4
+
+    if not is_clear() then
+        print("!!Error in test 2.2!!")
+        print_all()
+        return
+    end
+
+    -- test 2.3: 1 splitter (2 parts)
+    print("test 2.3")
+    create_setup(current_x, base_y)
+    create_setup(current_x + 1, base_y)
+
+    create_splitter({ current_x + 1, base_y + 3 })
+
+    create_part({ current_x, base_y + 4 })
+    create_part({ current_x + 1, base_y + 4 })
+
+    create_splitter({ current_x + 1, base_y + 5 })
+
+    destroy_entity({ current_x, base_y + 4 })
+    destroy_entity({ current_x + 1, base_y + 4 })
+    current_x = current_x + 5
+
+    if not is_clear() then
+        print("!!Error in test 2.3!!")
+        print_all()
+        return
+    end
+
+    -- test 3.1: 3 belts (remove middle first)
+    print("test 3.1")
+    create_setup(current_x, base_y)
+    create_setup(current_x + 1, base_y)
+    create_setup(current_x + 2, base_y)
+
+    create_belt({ current_x, base_y + 3 })
+    create_belt({ current_x + 1, base_y + 3 })
+    create_belt({ current_x + 2, base_y + 3 })
+
+    create_part({ current_x, base_y + 4 })
+    create_part({ current_x + 1, base_y + 4 })
+    create_part({ current_x + 2, base_y + 4 })
+
+    create_belt({ current_x, base_y + 5 })
+    create_belt({ current_x + 1, base_y + 5 })
+    create_belt({ current_x + 2, base_y + 5 })
+
+    destroy_entity({ current_x + 1, base_y + 4 })
+    destroy_entity({ current_x, base_y + 4 })
+    destroy_entity({ current_x + 2, base_y + 4 })
+    current_x = current_x + 5
+
+    if not is_clear() then
+        print("!!Error in test 3.1!!")
+        print_all()
+        return
+    end
+
+    -- test 3.2: 3 underground (remove middle first)
+    print("test 3.2")
+    create_extended_setup(current_x, base_y)
+    create_extended_setup(current_x + 1, base_y)
+    create_extended_setup(current_x + 2, base_y)
+
+    create_underground_belt({ current_x, base_y + 3 })
+    create_underground_belt({ current_x + 1, base_y + 3 })
+    create_underground_belt({ current_x + 2, base_y + 3 })
+
+    create_part({ current_x, base_y + 5 })
+    create_part({ current_x + 1, base_y + 5 })
+    create_part({ current_x + 2, base_y + 5 })
+
+    create_underground_belt({ current_x, base_y + 6 })
+    create_underground_belt({ current_x + 1, base_y + 6 })
+    create_underground_belt({ current_x + 2, base_y + 6 })
+
+    destroy_entity({ current_x + 1, base_y + 5 })
+    destroy_entity({ current_x, base_y + 5 })
+    destroy_entity({ current_x + 2, base_y + 5 })
+    current_x = current_x + 5
+
+    if not is_clear() then
+        print("!!Error in test 3.2!!")
+        print_all()
+        return
+    end
+
+    -- test 3.3: 2 splitter (remove middle first)
+    print("test 3.3")
+    create_setup(current_x, base_y)
+    create_setup(current_x + 1, base_y)
+    create_setup(current_x + 2, base_y)
+
+    create_splitter({ current_x + 1, base_y + 3 })
+    create_splitter({ current_x + 3, base_y + 3 })
+
+    create_part({ current_x, base_y + 4 })
+    create_part({ current_x + 1, base_y + 4 })
+    create_part({ current_x + 2, base_y + 4 })
+
+    create_splitter({ current_x + 1, base_y + 5 })
+    create_splitter({ current_x + 3, base_y + 5 })
+
+    destroy_entity({ current_x + 1, base_y + 4 })
+    destroy_entity({ current_x, base_y + 4 })
+    destroy_entity({ current_x + 2, base_y + 4 })
+    current_x = current_x + 5
+
+    if not is_clear() then
+        print("!!Error in test 3.3!!")
+        print_all()
+        return
     end
 end

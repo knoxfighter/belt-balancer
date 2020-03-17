@@ -203,13 +203,43 @@ function part_functions.remove(entity, buffer)
     global.parts[entity.unit_number] = nil
 
     for _, belt_index in pairs(part.input_belts) do
-        -- remove balancer from belt
         local belt = global.belts[belt_index]
-        belt.output_balancer[part.balancer] = nil
 
-        -- remove lanes from balancer
-        for _, lane in pairs(belt.lanes) do
-            balancer.input_lanes[lane] = nil
+        -- only remove lanes, if this is splitter
+        if belt.type == "splitter" then
+            local into_pos, _ = belt_functions.get_input_output_pos_splitter(belt.entity)
+            for _, pos in pairs(into_pos) do
+                local entity_pos = part.entity.position
+                if entity_pos.x == pos.position.x and entity_pos.y == pos.position.y then
+                    -- remove lanes from balancer
+                    for _, lane_index in pairs(pos.lanes) do
+                        local lane = belt.lanes[lane_index]
+                        balancer.input_lanes[lane] = nil
+                    end
+                end
+            end
+
+            -- check if lanes are still in the balancer
+            local found_lane = false
+            for _, lane in pairs(balancer.input_lanes) do
+                if table.contains(belt.lanes, lane) then
+                    found_lane = true
+                    break
+                end
+            end
+
+            -- when lane not found, remove balancer from belt
+            if not found_lane then
+                belt.output_balancer[part.balancer] = nil
+            end
+        else
+            -- remove balancer from belt
+            belt.output_balancer[part.balancer] = nil
+
+            -- remove lanes from balancer
+            for _, lane in pairs(belt.lanes) do
+                balancer.input_lanes[lane] = nil
+            end
         end
 
         -- check if belt is still attached to a part
@@ -217,13 +247,43 @@ function part_functions.remove(entity, buffer)
     end
 
     for _, belt_index in pairs(part.output_belts) do
-        -- remove balancer from belt
         local belt = global.belts[belt_index]
-        belt.input_balancer[part.balancer] = nil
 
-        -- remove lanes from balancer
-        for _, lane in pairs(belt.lanes) do
-            balancer.output_lanes[lane] = nil
+        -- only remove lanes, if this is splitter
+        if belt.type == "splitter" then
+            local _, from_pos = belt_functions.get_input_output_pos_splitter(belt.entity)
+            for _, pos in pairs(from_pos) do
+                local entity_pos = part.entity.position
+                if entity_pos.x == pos.position.x and entity_pos.y == pos.position.y then
+                    -- remove lanes from balancer
+                    for _, lane_index in pairs(pos.lanes) do
+                        local lane = belt.lanes[lane_index]
+                        balancer.output_lanes[lane] = nil
+                    end
+                end
+            end
+
+            -- check if lanes are still in the balancer
+            local found_lane = false
+            for _, lane in pairs(balancer.output_lanes) do
+                if table.contains(belt.lanes, lane) then
+                    found_lane = true
+                    break
+                end
+            end
+
+            -- when lane not found, remove balancer from belt
+            if not found_lane then
+                belt.input_balancer[part.balancer] = nil
+            end
+        else
+            -- remove balancer from belt
+            belt.input_balancer[part.balancer] = nil
+
+            -- remove lanes from balancer
+            for _, lane in pairs(belt.lanes) do
+                balancer.output_lanes[lane] = nil
+            end
         end
 
         -- check if belt is still attached to a part
@@ -237,7 +297,8 @@ function part_functions.remove(entity, buffer)
     local drop_to = {
         buffer = buffer,
         position = entity.position,
-        surface = entity.surface
+        surface = entity.surface,
+        force = entity.force
     }
 
     -- check if balancer is valid
