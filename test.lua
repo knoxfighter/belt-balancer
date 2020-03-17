@@ -1145,38 +1145,38 @@ function test_mod(player_index)
 
     local function check_complete_removal(current_x, base_y)
         -- test 1: 2 belts, remove all parts
-        --create_basic_setup(current_x, base_y)
-        --create_basic_setup(current_x + 1, base_y)
-        --
-        --create_belt({ current_x, base_y + 3 })
-        --create_belt({ current_x + 1, base_y + 3 })
-        --
-        --create_part({ current_x, base_y + 4 })
-        --create_part({ current_x + 1, base_y + 4 })
-        --
-        --create_belt({ current_x, base_y + 5 })
-        --create_belt({ current_x + 1, base_y + 5 })
-        --
-        --destroy_entity({ current_x, base_y + 4 })
-        --destroy_entity({ current_x + 1, base_y + 4 })
-        --current_x = current_x + 5
+        create_basic_setup(current_x, base_y)
+        create_basic_setup(current_x + 1, base_y)
+
+        create_belt({ current_x, base_y + 3 })
+        create_belt({ current_x + 1, base_y + 3 })
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+
+        create_belt({ current_x, base_y + 5 })
+        create_belt({ current_x + 1, base_y + 5 })
+
+        destroy_entity({ current_x, base_y + 4 })
+        destroy_entity({ current_x + 1, base_y + 4 })
+        current_x = current_x + 5
 
         -- test 2: 2 underground, remove all parts
-        --create_extended_setup(current_x, base_y)
-        --create_extended_setup(current_x + 1, base_y)
-        --
-        --create_underground_belt({ current_x, base_y + 3 })
-        --create_underground_belt({ current_x + 1, base_y + 3 })
-        --
-        --create_part({ current_x, base_y + 5 })
-        --create_part({ current_x + 1, base_y + 5 })
-        --
-        --create_underground_belt({ current_x, base_y + 6 })
-        --create_underground_belt({ current_x + 1, base_y + 6 })
-        --
-        --destroy_entity({ current_x, base_y + 5 })
-        --destroy_entity({ current_x + 1, base_y + 5 })
-        --current_x = current_x + 5
+        create_extended_setup(current_x, base_y)
+        create_extended_setup(current_x + 1, base_y)
+
+        create_underground_belt({ current_x, base_y + 3 })
+        create_underground_belt({ current_x + 1, base_y + 3 })
+
+        create_part({ current_x, base_y + 5 })
+        create_part({ current_x + 1, base_y + 5 })
+
+        create_underground_belt({ current_x, base_y + 6 })
+        create_underground_belt({ current_x + 1, base_y + 6 })
+
+        destroy_entity({ current_x, base_y + 5 })
+        destroy_entity({ current_x + 1, base_y + 5 })
+        current_x = current_x + 5
 
         -- test 3: 1 splitter, remove all parts
         create_basic_setup(current_x, base_y)
@@ -1189,54 +1189,54 @@ function test_mod(player_index)
 
         create_splitter({ current_x + 1, base_y + 5 })
 
-        --destroy_entity({ current_x, base_y + 4 })
-        --destroy_entity({ current_x + 1, base_y + 4 })
+        destroy_entity({ current_x, base_y + 4 })
+        destroy_entity({ current_x + 1, base_y + 4 })
         current_x = current_x + 8
     end
 
     local current_x = 0
     local base_y = 0
-    --local new_current_x = check_built(current_x, base_y)
-    --
-    --base_y = base_y + 15
-    --check_built(current_x, base_y, "fast-")
-    --
-    --base_y = base_y + 15
-    --check_built(current_x, base_y, "express-")
-    --
-    --current_x = new_current_x + 6
-    --base_y = 0
-    --new_current_x = check_multipart_belts(current_x)
-    --
-    --new_current_x = check_part_add(new_current_x)
-    --
-    --new_current_x = check_part_merge(new_current_x)
-    --
-    --base_y = 15
-    --check_balance(current_x, base_y)
-    --
-    --base_y = base_y + 15
-    --check_remove_belts(current_x, base_y)
-    --
-    --base_y = base_y + 15
-    --check_remove_part(current_x, base_y)
-    --
-    --current_x = new_current_x + 4
-    --base_y = 0
-    --new_current_x = check_rotation(current_x, base_y)
-    --
-    --base_y = base_y + 15
-    --check_buffer(current_x, base_y)
-    --
-    --base_y = base_y + 15
-    --check_basic_usage(current_x, base_y)
-    --
-    --base_y = base_y + 15
-    --local cont_current_x = check_underground_skip(current_x, base_y)
-    --
-    --check_different_input_output_speed(cont_current_x or current_x, base_y)
-    --
-    --current_x = new_current_x
+    local new_current_x = check_built(current_x, base_y)
+
+    base_y = base_y + 15
+    check_built(current_x, base_y, "fast-")
+
+    base_y = base_y + 15
+    check_built(current_x, base_y, "express-")
+
+    current_x = new_current_x + 6
+    base_y = 0
+    new_current_x = check_multipart_belts(current_x)
+
+    new_current_x = check_part_add(new_current_x)
+
+    new_current_x = check_part_merge(new_current_x)
+
+    base_y = 15
+    check_balance(current_x, base_y)
+
+    base_y = base_y + 15
+    check_remove_belts(current_x, base_y)
+
+    base_y = base_y + 15
+    check_remove_part(current_x, base_y)
+
+    current_x = new_current_x + 4
+    base_y = 0
+    new_current_x = check_rotation(current_x, base_y)
+
+    base_y = base_y + 15
+    check_buffer(current_x, base_y)
+
+    base_y = base_y + 15
+    check_basic_usage(current_x, base_y)
+
+    base_y = base_y + 15
+    local cont_current_x = check_underground_skip(current_x, base_y)
+
+    check_different_input_output_speed(cont_current_x or current_x, base_y)
+
+    current_x = new_current_x
     base_y = 0
     check_complete_removal(current_x, base_y)
 
