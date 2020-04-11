@@ -1143,6 +1143,78 @@ function test_mod(player_index)
         return current_x
     end
 
+    local function check_krastorio_belts(current_x, base_y)
+        -- test 0: 2 belts, 2 green
+        create_basic_setup(current_x, base_y, "kr-advanced-")
+        create_basic_setup(current_x + 1, base_y, "kr-advanced-")
+
+        create_belt({ current_x, base_y + 3 }, "kr-advanced-")
+        create_belt({ current_x + 1, base_y + 3 }, "kr-advanced-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+
+        create_belt({ current_x, base_y + 5 }, "kr-advanced-")
+        create_belt({ current_x + 1, base_y + 5 }, "kr-advanced-")
+        current_x = current_x + 4
+
+        -- test 1: 4 belts, 3  yellow, 1 purple
+        create_basic_setup(current_x, base_y, "fast-")
+        create_basic_setup(current_x + 1, base_y, "fast-")
+        create_basic_setup(current_x + 2, base_y, "fast-")
+        create_basic_setup(current_x + 3, base_y, "kr-superior-")
+
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_belt({ current_x + 1, base_y + 3 }, "fast-")
+        create_belt({ current_x + 2, base_y + 3 }, "fast-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 }, "kr-superior-")
+        current_x = current_x + 6
+
+        -- test 2: 4 belts, 3 yellow, 1 green
+        create_basic_setup(current_x, base_y, "fast-")
+        create_basic_setup(current_x + 1, base_y, "fast-")
+        create_basic_setup(current_x + 2, base_y, "fast-")
+        create_basic_setup(current_x + 3, base_y, "kr-advanced-")
+
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_belt({ current_x + 1, base_y + 3 }, "fast-")
+        create_belt({ current_x + 2, base_y + 3 }, "fast-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 3, base_y + 5 }, "kr-advanced-")
+        current_x = current_x + 6
+
+        -- test 3: 4 belts, 1 green, 3 yellow
+        create_basic_setup(current_x, base_y, "kr-advanced-")
+        create_basic_setup(current_x + 1, base_y)
+        create_basic_setup(current_x + 2, base_y)
+        create_basic_setup(current_x + 3, base_y)
+
+        create_belt({ current_x, base_y + 3 }, "kr-advanced-")
+
+        create_part({ current_x, base_y + 4 })
+        create_part({ current_x + 1, base_y + 4 })
+        create_part({ current_x + 2, base_y + 4 })
+        create_part({ current_x + 3, base_y + 4 })
+
+        create_belt({ current_x + 1, base_y + 5 })
+        create_belt({ current_x + 2, base_y + 5 })
+        create_belt({ current_x + 3, base_y + 5 })
+        current_x = current_x + 6
+
+        return current_x
+    end
+
     local function check_complete_removal(current_x, base_y)
         -- test 1: 2 belts, remove all parts
         create_basic_setup(current_x, base_y)
@@ -1243,6 +1315,11 @@ function test_mod(player_index)
     base_y = base_y + 15
     if script.active_mods["boblogistics"] then
         check_bobs_belts(current_x, base_y)
+    end
+
+    base_y = base_y + 15
+    if script.active_mods["Krastorio2"] then
+        check_krastorio_belts(current_x, base_y)
     end
 end
 
