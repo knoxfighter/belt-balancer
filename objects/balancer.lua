@@ -195,7 +195,7 @@ function balancer_functions.run(balancer_index)
 
             for k, lane_index in pairs(current_lanes) do
                 local lane = global.lanes[lane_index]
-                if #lane > 0 then
+                if lane ~= nil and lane.valid and #lane > 0 then
                     -- remove item from lane and add to buffer
                     local lua_item = lane[1]
                     local simple_item = convert_LuaItemStack_to_SimpleItemStack(lua_item)
