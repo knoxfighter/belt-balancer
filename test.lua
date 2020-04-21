@@ -143,6 +143,21 @@ function test_mod(player_index)
         end
     end
 
+    local function fast_replace_entity(position, entity_name, direction, type)
+        direction = direction or defines.direction.south
+        type = type or "output"
+
+        return surface.create_entity {
+            name = entity_name,
+            position = position,
+            direction = direction,
+            force = player.force,
+            raise_built = true,
+            fast_replace = true,
+            type = type
+        }
+    end
+
     ---setup without 3-4-5, there has to be placed the test itself
     ---@param x number
     ---@param base_y number
@@ -1266,6 +1281,242 @@ function test_mod(player_index)
         current_x = current_x + 8
     end
 
+    local function check_fast_replace(current_x, base_y)
+        -- test 1.1.1: 1 belt, fast replace input
+        create_basic_setup(current_x, base_y, "fast-")
+        create_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 }, "fast-")
+        fast_replace_entity({ current_x, base_y + 3 }, "fast-transport-belt")
+        current_x = current_x + 3
+
+        -- test 1.1.2: 1 belt, fast replace input reversed
+        create_basic_setup(current_x, base_y, "fast-")
+        create_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 }, "fast-")
+        fast_replace_entity({ current_x, base_y + 3 }, "fast-transport-belt", defines.direction.north)
+        current_x = current_x + 3
+
+        -- test 1.1.3: 1 belt, fast replace input to right
+        create_basic_setup(current_x, base_y, "fast-")
+        create_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 }, "fast-")
+        fast_replace_entity({ current_x, base_y + 3 }, "fast-transport-belt", defines.direction.east)
+        current_x = current_x + 3
+
+        -- test 1.1.4: 1 belt, fast replace input to left
+        create_basic_setup(current_x, base_y, "fast-")
+        create_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 }, "fast-")
+        fast_replace_entity({ current_x, base_y + 3 }, "fast-transport-belt", defines.direction.west)
+        current_x = current_x + 4
+
+        -- test 1.2.1: 1 belt, fast replace output
+        create_basic_setup(current_x, base_y, "fast-")
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 5 }, "fast-transport-belt")
+        current_x = current_x + 3
+
+        -- test 1.2.2: 1 belt, fast replace output reversed
+        create_basic_setup(current_x, base_y, "fast-")
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 5 }, "fast-transport-belt", defines.direction.north)
+        current_x = current_x + 3
+
+        -- test 1.2.3: 1 belt, fast replace output to right
+        create_basic_setup(current_x, base_y, "fast-")
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 5 }, "fast-transport-belt", defines.direction.east)
+        current_x = current_x + 3
+
+        -- test 1.2.4: 1 belt, fast replace output to left
+        create_basic_setup(current_x, base_y, "fast-")
+        create_belt({ current_x, base_y + 3 }, "fast-")
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 5 }, "fast-transport-belt", defines.direction.west)
+        current_x = current_x + 6
+
+        -- test 2.1.1: 1 underground, fast replace input
+        create_extended_setup(current_x, base_y, "fast-")
+        create_underground_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 5 })
+        create_underground_belt({ current_x, base_y + 6 }, "fast-")
+        fast_replace_entity({ current_x, base_y + 3 }, "fast-underground-belt", defines.direction.south, "input")
+        fast_replace_entity({ current_x, base_y + 4 }, "fast-underground-belt", defines.direction.south, "output")
+        current_x = current_x + 3
+
+        -- test 2.2.1: 1 underground, fast replace output
+        create_extended_setup(current_x, base_y, "fast-")
+        create_underground_belt({ current_x, base_y + 3 }, "fast-")
+        create_part({ current_x, base_y + 5 })
+        create_underground_belt({ current_x, base_y + 6 })
+        fast_replace_entity({ current_x, base_y + 7 }, "fast-underground-belt", defines.direction.south, "output")
+        fast_replace_entity({ current_x, base_y + 6 }, "fast-underground-belt", defines.direction.south, "input")
+        current_x = current_x + 6
+
+        -- test 3.1.1: 1 splitter, fast replace input
+        create_basic_setup(current_x, base_y, "fast-")
+        create_splitter({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_splitter({ current_x, base_y + 5 }, "fast-")
+        fast_replace_entity({ current_x, base_y + 3 }, "fast-splitter")
+        current_x = current_x + 3
+
+        -- test 3.1.2: 1 splitter, fast replace input reversed
+        create_basic_setup(current_x, base_y, "fast-")
+        create_splitter({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_splitter({ current_x, base_y + 5 }, "fast-")
+        fast_replace_entity({ current_x, base_y + 3 }, "fast-splitter", defines.direction.north)
+        current_x = current_x + 5
+
+        -- test 3.2.1: 1 splitter, fast replace output
+        create_basic_setup(current_x, base_y, "fast-")
+        create_splitter({ current_x, base_y + 3 }, "fast-")
+        create_part({ current_x, base_y + 4 })
+        create_splitter({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 5 }, "fast-splitter")
+        current_x = current_x + 3
+
+        -- test 3.2.2: 1 splitter, fast replace output reversed
+        create_basic_setup(current_x, base_y, "fast-")
+        create_splitter({ current_x, base_y + 3 }, "fast-")
+        create_part({ current_x, base_y + 4 })
+        create_splitter({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 5 }, "fast-splitter", defines.direction.north)
+        current_x = current_x + 6
+
+        -- test 4.1.1: 1 belt, fast replace input to underground
+        create_extended_setup(current_x, base_y)
+
+        create_belt({ current_x, base_y + 3 })
+        create_belt({ current_x, base_y + 4 })
+
+        create_part({ current_x, base_y + 5 })
+
+        create_belt({ current_x, base_y + 6 })
+        create_belt({ current_x, base_y + 7 })
+
+        fast_replace_entity({ current_x, base_y + 3 }, "underground-belt", defines.direction.south, "input")
+        fast_replace_entity({ current_x, base_y + 4 }, "underground-belt", defines.direction.south, "output")
+        current_x = current_x + 3
+
+        -- test 4.1.2: 1 belt, fast replace output to underground
+        create_extended_setup(current_x, base_y)
+
+        create_belt({ current_x, base_y + 3 })
+        create_belt({ current_x, base_y + 4 })
+
+        create_part({ current_x, base_y + 5 })
+
+        create_belt({ current_x, base_y + 6 })
+        create_belt({ current_x, base_y + 7 })
+
+        fast_replace_entity({ current_x, base_y + 7 }, "underground-belt", defines.direction.south, "output")
+        fast_replace_entity({ current_x, base_y + 6 }, "underground-belt", defines.direction.south, "input")
+        current_x = current_x + 5
+
+        -- test 4.2.1: 1 belt, fast replace input to splitter
+        create_basic_setup(current_x, base_y)
+        create_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 3 }, "splitter")
+        current_x = current_x + 3
+
+        -- test 4.2.2: 1 belt, fast replace output to splitter
+        create_basic_setup(current_x, base_y)
+        create_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_belt({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 5 }, "splitter")
+        current_x = current_x + 5
+
+        -- test 5.1.1: 1 underground, fast replace input to belt
+        create_extended_setup(current_x, base_y)
+        create_underground_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 5 })
+        create_underground_belt({ current_x, base_y + 6 })
+        fast_replace_entity({ current_x, base_y + 3 }, "transport-belt")
+        fast_replace_entity({ current_x, base_y + 4 }, "transport-belt")
+        current_x = current_x + 3
+
+        -- test 5.1.2: 1 underground, fast replace output to belt
+        create_extended_setup(current_x, base_y)
+        create_underground_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 5 })
+        create_underground_belt({ current_x, base_y + 6 })
+        fast_replace_entity({ current_x, base_y + 7 }, "transport-belt")
+        fast_replace_entity({ current_x, base_y + 6 }, "transport-belt")
+        current_x = current_x + 5
+
+        -- test 5.2.1: 1 underground, fast replace input with splitter
+        create_extended_setup(current_x, base_y)
+        create_underground_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 5 })
+        create_underground_belt({ current_x, base_y + 6 })
+        fast_replace_entity({ current_x, base_y + 3 }, "transport-belt")
+        fast_replace_entity({ current_x, base_y + 4 }, "splitter")
+        current_x = current_x + 3
+
+        -- test 5.2.1: 1 underground, fast replace output with splitter
+        create_extended_setup(current_x, base_y)
+        create_underground_belt({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 5 })
+        create_underground_belt({ current_x, base_y + 6 })
+        fast_replace_entity({ current_x, base_y + 7 }, "transport-belt")
+        fast_replace_entity({ current_x, base_y + 6 }, "splitter")
+        current_x = current_x + 5
+
+        -- test 6.1.1: 1 splitter, fast replace input to belt
+        create_basic_setup(current_x, base_y)
+        create_splitter({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_splitter({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 3 }, "transport-belt")
+        current_x = current_x + 3
+
+        -- test 6.1.2: 1 splitter, fast replace output to belt
+        create_basic_setup(current_x, base_y)
+        create_splitter({ current_x, base_y + 3 })
+        create_part({ current_x, base_y + 4 })
+        create_splitter({ current_x, base_y + 5 })
+        fast_replace_entity({ current_x, base_y + 5 }, "transport-belt")
+        current_x = current_x + 5
+
+        -- test 6.2.1: 1 splitter, fast replace input to underground
+        create_extended_setup(current_x, base_y)
+        create_belt({ current_x, base_y + 3 })
+        create_splitter({ current_x, base_y + 4 })
+        create_part({ current_x, base_y + 5 })
+        create_splitter({ current_x, base_y + 6 })
+        create_belt({ current_x, base_y + 7 })
+        fast_replace_entity({ current_x, base_y + 3 }, "underground-belt", defines.direction.south, "input")
+        fast_replace_entity({ current_x, base_y + 4 }, "underground-belt", defines.direction.south, "output")
+        current_x = current_x + 3
+
+        -- test 6.2.2: 1 splitter, fast replace output to underground
+        create_extended_setup(current_x, base_y)
+        create_belt({ current_x, base_y + 3 })
+        create_splitter({ current_x, base_y + 4 })
+        create_part({ current_x, base_y + 5 })
+        create_splitter({ current_x, base_y + 6 })
+        create_belt({ current_x, base_y + 7 })
+        fast_replace_entity({ current_x, base_y + 7 }, "underground-belt", defines.direction.south, "output")
+        fast_replace_entity({ current_x, base_y + 6 }, "underground-belt", defines.direction.south, "input")
+        current_x = current_x + 5
+    end
+
     local current_x = 0
     local base_y = 0
     local new_current_x = check_built(current_x, base_y)
@@ -1321,6 +1572,10 @@ function test_mod(player_index)
     if script.active_mods["Krastorio2"] then
         check_krastorio_belts(current_x, base_y)
     end
+
+    base_y = base_y + 40
+    current_x = 0
+    check_fast_replace(current_x, base_y)
 end
 
 function test_mod_logic(player_index)
@@ -1457,6 +1712,21 @@ function test_mod_logic(player_index)
         for _, entity in pairs(entities) do
             entity.destroy({ raise_destroy = true })
         end
+    end
+
+    local function fast_replace_entity(position, entity_name, direction, type)
+        direction = direction or defines.direction.south
+        type = type or "output"
+
+        return surface.create_entity {
+            name = entity_name,
+            position = position,
+            direction = direction,
+            force = player.force,
+            raise_built = true,
+            fast_replace = true,
+            type = type
+        }
     end
 
     ---setup wih part, but without 3--5
@@ -1705,6 +1975,84 @@ function test_mod_logic(player_index)
     if not is_clear() then
         print("!!Error in test 3.3!!")
         print_all()
+        return
+    end
+
+    ------- fast replace tests ------------------------------------
+    -- test 4.1: 1 belt, upgrade to higher
+    print("test 4.1")
+    create_setup(current_x, base_y, "fast-")
+    create_belt({ current_x, base_y + 3 })
+    create_part({ current_x, base_y + 4 })
+    create_belt({ current_x, base_y + 5 }, "fast-")
+    fast_replace_entity({ current_x, base_y + 3 }, "fast-transport-belt")
+    destroy_entity({ current_x, base_y + 4 })
+    current_x = current_x + 3
+
+    if not is_clear() then
+        print("!!Error in test 4.1!!")
+        return
+    end
+
+    -- test 4.2: 1 underground, upgrade to higher
+    print("test 4.2")
+    create_extended_setup(current_x, base_y, "fast-")
+    create_underground_belt({ current_x, base_y + 3 })
+    create_part({ current_x, base_y + 5 })
+    create_belt({ current_x, base_y + 6 }, "fast-")
+    create_belt({ current_x, base_y + 7 }, "fast-")
+    fast_replace_entity({ current_x, base_y + 3 }, "fast-underground-belt", defines.direction.south, "input")
+    fast_replace_entity({ current_x, base_y + 4 }, "fast-underground-belt", defines.direction.south, "output")
+    destroy_entity({ current_x, base_y + 5 })
+    current_x = current_x + 3
+
+    if not is_clear() then
+        print("!!Error in test 4.2!!")
+        return
+    end
+
+    -- test 4.3: 1 splitter, upgrade to higher
+    print("test 4.3")
+    create_setup(current_x, base_y, "fast-")
+    create_splitter({ current_x, base_y + 3 })
+    create_part({ current_x, base_y + 4 })
+    create_belt({ current_x, base_y + 5 }, "fast-")
+    fast_replace_entity({ current_x, base_y }, "fast-splitter")
+    destroy_entity({ current_x, base_y + 4 })
+    current_x = current_x + 5
+
+    if not is_clear() then
+        print("!!Error in test 4.3!!")
+        return
+    end
+
+    -- test 5.1: 1 belt, fast replace to splitter
+    print("test 5.1")
+    create_setup(current_x, base_y)
+    create_belt({ current_x, base_y + 3 })
+    create_part({ current_x, base_y + 4 })
+    create_belt({ current_x, base_y + 5 })
+    fast_replace_entity({ current_x, base_y + 3 }, "splitter")
+    destroy_entity({ current_x, base_y + 4 })
+    current_x = current_x + 3
+
+    if not is_clear() then
+        print("!!Error in test 5.1!!")
+        return
+    end
+
+    -- test 5.2: 1 splitter, fast replace to belt
+    print("test 5.2")
+    create_setup(current_x, base_y)
+    create_splitter({ current_x, base_y + 3 })
+    create_part({ current_x, base_y + 4 })
+    create_belt({ current_x, base_y + 5 })
+    fast_replace_entity({ current_x, base_y + 3 }, "transport-belt")
+    destroy_entity({ current_x, base_y + 4 })
+    current_x = current_x + 5
+
+    if not is_clear() then
+        print("!!Error in test 5.2!!")
         return
     end
 end

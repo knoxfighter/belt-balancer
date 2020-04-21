@@ -57,6 +57,17 @@ Belt.type = nil
 ---@type LuaEntity
 Belt.entity = nil
 
+--- The position of this belt
+---@type Position
+Belt.position = nil
+
+--- The direction of this belt
+---@type defines.direction
+Belt.direction = nil
+--- The surface, where the belt is on
+---@type LuaSurface
+Belt.surface = nil
+
 --------------------------------------------------------------------------------------------------------------
 
 ---@class Part

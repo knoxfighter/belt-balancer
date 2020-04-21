@@ -84,6 +84,32 @@ if debug and script.active_mods["creative-mod"] then
     end)
 end
 
+---check if this entity was built with fast-replace
+---if so, remove the fast-replaced entity from tracking.
+---@param new_entity LuaEntity
+function process_fast_replace(new_entity)
+    local belts = {}
+
+    for unit_number, belt in pairs(global.belts) do
+        -- only run, when entities overlapping and are on the same surface
+        if new_entity.surface == belt.surface
+            and  belt.position.x >= new_entity.position.x - 0.5 and belt.position.x <= new_entity.position.x + 0.5
+            and belt.position.y >= new_entity.position.y - 0.5 and belt.position.y <= new_entity.position.y + 0.5 then
+
+            belts[unit_number] = belt
+        end
+    end
+
+    for unit_number, belt in pairs(belts) do
+        -- remove fast-replaced invalid entity
+        if belt.type == "splitter" then
+            belt_functions.remove_splitter(belt.entity, belt.direction, unit_number, belt.surface, belt.position)
+        else
+            belt_functions.remove_belt(belt.entity, belt.direction, unit_number, belt.surface, belt.position)
+        end
+    end
+end
+
 function built_entity(e)
     ---@type LuaEntity
     local entity
@@ -99,14 +125,17 @@ function built_entity(e)
     end
 
     if entity.type == "transport-belt" then
+        process_fast_replace(entity)
         belt_functions.built_belt(entity)
     end
 
     if entity.type == "underground-belt" then
+        process_fast_replace(entity)
         belt_functions.built_belt(entity)
     end
 
     if entity.type == "splitter" then
+        process_fast_replace(entity)
         belt_functions.built_splitter(entity)
     end
 end
