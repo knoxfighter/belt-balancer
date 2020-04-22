@@ -4,7 +4,7 @@ Date: 22.04.2020
   Added:
     - Compatibility with mods, that are changing the direction of belts directly (e.g. Picker Belt Tools). It may take a few seconds until the change is registered, dont rotate or remove the belt in that time, it will cause a crash!!
   Bugfix:
-    - Fixed crash, when other mods do a fast-replace of belts.
+    - Fixed crash, when other mods do a fast-replace of belts. (this will only fix `Construction Drones` with factorio 0.18!)
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.2/2.1.2
 Date: 17.03.2020
