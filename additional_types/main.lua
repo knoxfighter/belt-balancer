@@ -130,6 +130,10 @@ Global.next_balancer_unit_number = nil
 ---@type uint
 Global.next_lane_unit_number = nil
 
+--- The next belt index to check
+---@type number
+Global.next_belt_check = nil
+
 --------------------------------------------------------------------------------------------------------------
 
 ---@type Global

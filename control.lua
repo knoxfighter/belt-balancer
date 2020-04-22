@@ -10,6 +10,7 @@ script.on_init(function()
     -- set defaults and initialize values in global table
     global.next_balancer_unit_number = 1
     global.next_lane_unit_number = 1
+    global.next_belt_check = nil
     global.balancer = {}
     global.parts = {}
     global.belts = {}
@@ -214,3 +215,21 @@ script.on_event({ defines.events.on_player_rotated_entity },
         end
     end
 )
+
+script.on_event(defines.events.on_tick, function()
+    local unit_number, belt = next(global.belts, global.next_belt_check)
+
+    -- check if belt direction got changed
+    if belt and belt.entity.valid and belt.direction ~= belt.entity.direction then
+        -- remove belt and readd it
+        if belt.type == "splitter" then
+            belt_functions.remove_splitter(belt.entity, belt.direction, unit_number, belt.entity.surface, belt.position)
+            belt_functions.built_splitter(belt.entity)
+        else
+            belt_functions.remove_belt(belt.entity, belt.direction, unit_number, belt.entity.surface, belt.position)
+            belt_functions.built_belt(belt.entity)
+        end
+    end
+
+    global.next_belt_check = unit_number
+end)

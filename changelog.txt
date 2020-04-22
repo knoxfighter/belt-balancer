@@ -1,6 +1,8 @@
 ---------------------------------------------------------------------------------------------------
 Version: 1.2.3/2.1.3
 Date: x.04.2020
+  Added:
+    - Compatibility with mods, that are changing the direction of belts directly (e.g. Picker Belt Tools). It may take a few seconds until the change is registered, dont rotate or remove the belt in that time, it will cause a crash!!
   Bugfix:
     - Fixed crash, when other mods do a fast-replace of belts.
 ---------------------------------------------------------------------------------------------------

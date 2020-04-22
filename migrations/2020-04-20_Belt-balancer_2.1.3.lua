@@ -1,3 +1,7 @@
+-- add next_belt_check to the save
+global.next_belt_check = nil
+
+-- Iterate over all belts, update their layout and remove invalid ones.
 for unit_number, belt in pairs(global.belts) do
     if belt.entity.valid then
         belt.position = belt.entity.position
