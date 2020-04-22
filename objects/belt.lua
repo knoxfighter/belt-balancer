@@ -16,6 +16,9 @@ function belt_functions.get_or_create(belt_entity)
 
     belt.entity = belt_entity
     belt.type = belt_entity.type
+    belt.position = belt_entity.position
+    belt.direction = belt_entity.direction
+    belt.surface = belt_entity.surface
     belt.output_balancer = {}
     belt.input_balancer = {}
 
@@ -44,25 +47,26 @@ end
 ---get_input_output_pos
 ---get the positions where the belt will transport items from and to
 ---@param belt LuaEntity the belt to calculate on
----@param direction defines.direction override the direction of the belt. if nil will use belt.direction
+---@param direction defines.direction override the direction of the belt. if nil will use belt.direction (has to be used if belt is invalid!!)
+---@param position Position override the position of the belt. if nil will use belt.position (has to be used if belt is invalid!!)
 ---@return Position,Position return the positions (into, from)
-function belt_functions.get_input_output_pos(belt, direction)
-    local belt_pos = belt.position
-    local into_pos, from_pos
+function belt_functions.get_input_output_pos(belt, direction, position)
+    position = position or belt.position
     direction = direction or belt.direction
+    local into_pos, from_pos
 
     if direction == defines.direction.north then
-        into_pos = { x = belt_pos.x, y = belt_pos.y - 1 }
-        from_pos = { x = belt_pos.x, y = belt_pos.y + 1 }
+        into_pos = { x = position.x, y = position.y - 1 }
+        from_pos = { x = position.x, y = position.y + 1 }
     elseif direction == defines.direction.south then
-        into_pos = { x = belt_pos.x, y = belt_pos.y + 1 }
-        from_pos = { x = belt_pos.x, y = belt_pos.y - 1 }
+        into_pos = { x = position.x, y = position.y + 1 }
+        from_pos = { x = position.x, y = position.y - 1 }
     elseif direction == defines.direction.west then
-        into_pos = { x = belt_pos.x - 1, y = belt_pos.y }
-        from_pos = { x = belt_pos.x + 1, y = belt_pos.y }
+        into_pos = { x = position.x - 1, y = position.y }
+        from_pos = { x = position.x + 1, y = position.y }
     elseif direction == defines.direction.east then
-        into_pos = { x = belt_pos.x + 1, y = belt_pos.y }
-        from_pos = { x = belt_pos.x - 1, y = belt_pos.y }
+        into_pos = { x = position.x + 1, y = position.y }
+        from_pos = { x = position.x - 1, y = position.y }
     end
 
     return into_pos, from_pos
@@ -72,9 +76,10 @@ end
 ---get the positions where the splitter will transport items from and to
 ---@param splitter LuaEntity the splitter to calculate on
 ---@param direction defines.direction override the direction of the belt. if nil will use belt.direction
+---@param position Position override the position of the belt. if nil will use belt.position (has to be used if belt is invalid!!)
 ---@return Get_input_output_pos_splitter_result[],Get_input_output_pos_splitter_result[] returns array of positions and belt-lanes (into, from).
-function belt_functions.get_input_output_pos_splitter(splitter, direction)
-    local splitter_pos = splitter.position
+function belt_functions.get_input_output_pos_splitter(splitter, direction, position)
+    local splitter_pos = position or splitter.position
     direction = direction or splitter.direction
     ---@type Get_input_output_pos_splitter_result[]
     local into_pos = {}
@@ -113,18 +118,23 @@ end
 ---finds the parts, that the belt has as input/output
 ---@param belt LuaEntity the belt to search from
 ---@param direction defines.direction override the direction of the belt.
+---@param surface LuaSurface override the surface of the entity. if nil will use belt.surface. (has to be used, when belt-entity is invalid!!)
+---@param position Position override the position of the entity. if nil will use belt.position. (has to be used, when belt-entity is invalid!!)
 ---@return Part,Part into_part, from_part
-function belt_functions.get_input_output_parts(belt, direction)
-    local into_pos, from_pos = belt_functions.get_input_output_pos(belt, direction)
+function belt_functions.get_input_output_parts(belt, direction, surface, position)
+    surface = surface or belt.surface
+    position = position or belt.position
+
+    local into_pos, from_pos = belt_functions.get_input_output_pos(belt, direction, position)
 
     local into_part, from_part
 
-    local into_entity = belt.surface.find_entity("balancer-part", into_pos)
+    local into_entity = surface.find_entity("balancer-part", into_pos)
     if into_entity then
         into_part = part_functions.get_or_create(into_entity)
     end
 
-    local from_entity = belt.surface.find_entity("balancer-part", from_pos)
+    local from_entity = surface.find_entity("balancer-part", from_pos)
     if from_entity then
         from_part = part_functions.get_or_create(from_entity)
     end
@@ -135,9 +145,13 @@ end
 ---finds the parts, that the splitter has as input/output
 ---@param splitter LuaEntity the splitter to search from
 ---@param direction defines.direction override the direction of the splitter.
+---@param surface LuaSurface override the surface of the splitter. if nil will use belt.surface. (has to be used, when belt-entity is invalid!!)
+---@param position Position override the position of the splitter. if nil will use belt.position. (has to be used, when belt-entity is invalid!!)
 ---@return Get_input_output_parts_splitter_result[],Get_input_output_parts_splitter_result[] into_parts, from_parts
-function belt_functions.get_input_output_parts_splitter(splitter, direction)
-    local into_positions, from_positions = belt_functions.get_input_output_pos_splitter(splitter, direction)
+function belt_functions.get_input_output_parts_splitter(splitter, direction, surface, position)
+    surface = surface or splitter.surface
+
+    local into_positions, from_positions = belt_functions.get_input_output_pos_splitter(splitter, direction, position)
 
     ---@type Get_input_output_parts_splitter_result[]
     local into_parts = {}
@@ -145,7 +159,7 @@ function belt_functions.get_input_output_parts_splitter(splitter, direction)
     local from_parts = {}
 
     for _, into_position in pairs(into_positions) do
-        local into_entity = splitter.surface.find_entity("balancer-part", into_position.position)
+        local into_entity = surface.find_entity("balancer-part", into_position.position)
         if into_entity then
             ---@type Get_input_output_parts_splitter_result
             local into_part = into_position
@@ -156,7 +170,7 @@ function belt_functions.get_input_output_parts_splitter(splitter, direction)
     end
 
     for _, from_position in pairs(from_positions) do
-        local from_entity = splitter.surface.find_entity("balancer-part", from_position.position)
+        local from_entity = surface.find_entity("balancer-part", from_position.position)
         if from_entity then
             ---@type Get_input_output_parts_splitter_result
             local from_part = from_position
@@ -278,11 +292,18 @@ function belt_functions.built_splitter(splitter_entity)
     end
 end
 
----@param entity LuaEntity
+---@param entity LuaEntity The entity that got removed
 ---@param direction defines.direction override the direction of removal
-function belt_functions.remove_belt(entity, direction)
+---@param unit_number uint override the belts unit_number, this works on (has to be used, when entity is invalid!!)
+---@param surface LuaSurface override the surface of the belt. (has to be used, when entity is invalid!!)
+---@param position Position override the position of the belt. (has to be used, when entity is invalid!!)
+function belt_functions.remove_belt(entity, direction, unit_number, surface, position)
+    unit_number = unit_number or entity.unit_number
+    surface = surface or entity.surface
+    position = position or entity.position
+
     -- check if belt is tracked
-    local belt = global.belts[entity.unit_number]
+    local belt = global.belts[unit_number]
     if not belt then
         return
     end
@@ -293,14 +314,14 @@ function belt_functions.remove_belt(entity, direction)
     end
 
     -- remove belt from global stack
-    global.belts[entity.unit_number] = nil
+    global.belts[unit_number] = nil
 
     -- find input_output balancer
-    local into_part, from_part = belt_functions.get_input_output_parts(entity, direction)
+    local into_part, from_part = belt_functions.get_input_output_parts(entity, direction, surface, position)
 
     if into_part then
         -- remove belt from part
-        into_part.input_belts[entity.unit_number] = nil
+        into_part.input_belts[unit_number] = nil
 
         local balancer = global.balancer[into_part.balancer]
         for _, lane in pairs(belt.lanes) do
@@ -313,7 +334,7 @@ function belt_functions.remove_belt(entity, direction)
 
     if from_part then
         -- remove belt from part
-        from_part.output_belts[entity.unit_number] = nil
+        from_part.output_belts[unit_number] = nil
 
         local balancer = global.balancer[from_part.balancer]
         for _, lane in pairs(belt.lanes) do
@@ -335,9 +356,14 @@ end
 
 ---@param entity LuaEntity
 ---@param direction defines.direction override the direction
-function belt_functions.remove_splitter(entity, direction)
+---@param unit_number uint override the splitters unit_number, this works on (has to be used, when entity is invalid!!)
+---@param surface LuaSurface override the surface of the splitter. (has to be used, when entity is invalid!!)
+---@param position Position override the position of the splitter. (has to be used, when entity is invalid!!)
+function belt_functions.remove_splitter(entity, direction, unit_number, surface, position)
+    unit_number = unit_number or entity.unit_number
+
     -- check if splitter is tracked
-    local belt = global.belts[entity.unit_number]
+    local belt = global.belts[unit_number]
     if not belt then
         return
     end
@@ -348,12 +374,12 @@ function belt_functions.remove_splitter(entity, direction)
     end
 
     -- remove belt from global stack
-    global.belts[entity.unit_number] = nil
+    global.belts[unit_number] = nil
 
-    local into_parts, from_parts = belt_functions.get_input_output_parts_splitter(entity, direction)
+    local into_parts, from_parts = belt_functions.get_input_output_parts_splitter(entity, direction, surface, position)
     for _, part in pairs(into_parts) do
         -- remove belt from part
-        part.part.input_belts[entity.unit_number] = nil
+        part.part.input_belts[unit_number] = nil
 
         local balancer = global.balancer[part.part.balancer]
         for _, lane in pairs(belt.lanes) do
@@ -366,7 +392,7 @@ function belt_functions.remove_splitter(entity, direction)
 
     for _, part in pairs(from_parts) do
         -- remove belt from part
-        part.part.output_belts[entity.unit_number] = nil
+        part.part.output_belts[unit_number] = nil
 
         local balancer = global.balancer[part.part.balancer]
         for _, lane in pairs(belt.lanes) do

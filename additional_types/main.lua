@@ -57,6 +57,17 @@ Belt.type = nil
 ---@type LuaEntity
 Belt.entity = nil
 
+--- The position of this belt
+---@type Position
+Belt.position = nil
+
+--- The direction of this belt
+---@type defines.direction
+Belt.direction = nil
+--- The surface, where the belt is on
+---@type LuaSurface
+Belt.surface = nil
+
 --------------------------------------------------------------------------------------------------------------
 
 ---@class Part
@@ -118,6 +129,10 @@ Global.next_balancer_unit_number = nil
 --- Lanes need to have a unique id (unit_number). This is the next free uid to use!
 ---@type uint
 Global.next_lane_unit_number = nil
+
+--- The next belt index to check
+---@type number
+Global.next_belt_check = nil
 
 --------------------------------------------------------------------------------------------------------------
 

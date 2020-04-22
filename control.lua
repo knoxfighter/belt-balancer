@@ -10,6 +10,7 @@ script.on_init(function()
     -- set defaults and initialize values in global table
     global.next_balancer_unit_number = 1
     global.next_lane_unit_number = 1
+    global.next_belt_check = nil
     global.balancer = {}
     global.parts = {}
     global.belts = {}
@@ -81,6 +82,32 @@ end)
 --    print(serpent.block(global.lanes))
 --end)
 
+---check if this entity was built with fast-replace
+---if so, remove the fast-replaced entity from tracking.
+---@param new_entity LuaEntity
+function process_fast_replace(new_entity)
+    local belts = {}
+
+    for unit_number, belt in pairs(global.belts) do
+        -- only run, when entities overlapping and are on the same surface
+        if new_entity.surface == belt.surface
+            and  belt.position.x >= new_entity.position.x - 0.5 and belt.position.x <= new_entity.position.x + 0.5
+            and belt.position.y >= new_entity.position.y - 0.5 and belt.position.y <= new_entity.position.y + 0.5 then
+
+            belts[unit_number] = belt
+        end
+    end
+
+    for unit_number, belt in pairs(belts) do
+        -- remove fast-replaced invalid entity
+        if belt.type == "splitter" then
+            belt_functions.remove_splitter(belt.entity, belt.direction, unit_number, belt.surface, belt.position)
+        else
+            belt_functions.remove_belt(belt.entity, belt.direction, unit_number, belt.surface, belt.position)
+        end
+    end
+end
+
 function built_entity(e)
     ---@type LuaEntity
     local entity
@@ -96,14 +123,17 @@ function built_entity(e)
     end
 
     if entity.type == "transport-belt" then
+        process_fast_replace(entity)
         belt_functions.built_belt(entity)
     end
 
     if entity.type == "underground-belt" then
+        process_fast_replace(entity)
         belt_functions.built_belt(entity)
     end
 
     if entity.type == "splitter" then
+        process_fast_replace(entity)
         belt_functions.built_splitter(entity)
     end
 end
@@ -182,3 +212,21 @@ script.on_event({ defines.events.on_player_rotated_entity },
         end
     end
 )
+
+script.on_event(defines.events.on_tick, function()
+    local unit_number, belt = next(global.belts, global.next_belt_check)
+
+    -- check if belt direction got changed
+    if belt and belt.entity.valid and belt.direction ~= belt.entity.direction then
+        -- remove belt and readd it
+        if belt.type == "splitter" then
+            belt_functions.remove_splitter(belt.entity, belt.direction, unit_number, belt.entity.surface, belt.position)
+            belt_functions.built_splitter(belt.entity)
+        else
+            belt_functions.remove_belt(belt.entity, belt.direction, unit_number, belt.entity.surface, belt.position)
+            belt_functions.built_belt(belt.entity)
+        end
+    end
+
+    global.next_belt_check = unit_number
+end)
