@@ -226,24 +226,18 @@ function balancer_functions.run(balancer_index)
         end
 
         -- put items onto the belt
-        local function put_on_belts(lanes)
-            local second_iteration = {}
-            for _, lane_index in pairs(lanes) do
-                if #balancer.buffer > 0 then
-                    local lane = global.lanes[lane_index]
-                    if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
-                        table.remove(balancer.buffer, 1)
-                        balancer.last_success = lane_index
-                        table.insert(second_iteration, lane_index)
-                    end
-                else
-                    break
+        local second_iteration = {}
+        for _, lane_index in pairs(output_lanes_sorted) do
+            if #balancer.buffer > 0 then
+                local lane = global.lanes[lane_index]
+                if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
+                    table.remove(balancer.buffer, 1)
+                    balancer.last_success = lane_index
                 end
+            else
+                break
             end
-            return second_iteration
         end
-
-        put_on_belts(put_on_belts(output_lanes_sorted))
     end
 end
 
