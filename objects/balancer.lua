@@ -186,11 +186,11 @@ function balancer_functions.run(balancer_index)
         local output_lane_count = table_size(balancer.output_lanes)
         local gather_amount = (output_lane_count * 2) - buffer_count
 
-        local next_lanes = table.deepcopy(balancer.input_lanes)
+        local next_lanes = balancer.input_lanes
 
         -- INPUT
         while gather_amount > 0 and table_size(next_lanes) > 0 do
-            local current_lanes = table.deepcopy(next_lanes)
+            local current_lanes = next_lanes
             next_lanes = {}
 
             for k, lane_index in pairs(current_lanes) do
