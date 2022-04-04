@@ -9,11 +9,10 @@ function convert_LuaItemStack_to_SimpleItemStack(lua_item_stack)
         durability = lua_item_stack.durability,
     }
 
-    if lua_item_stack.prototype.type == "ammo" then
+    local itemtype = lua_item_stack.prototype.type
+    if itemtype == "ammo" then
         simple_item.ammo = lua_item_stack.ammo
-    end
-
-    if lua_item_stack.prototype.type == "item-with-tags" then
+    elseif itemtype == "item-with-tags" then
         simple_item.tags = lua_item_stack.tags
     end
 
