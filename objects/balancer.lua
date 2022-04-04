@@ -208,34 +208,26 @@ function balancer_functions.run(balancer_index)
             end
         end
 
-        -- create table with output lanes, with last_success at the beginning
-        local output_lanes_sorted = {}
-        local last_add_index = 0
-        local found_last_success = false
-        for _, lane in pairs(balancer.output_lanes) do
-            if found_last_success then
-                last_add_index = last_add_index + 1
-                table.insert(output_lanes_sorted, last_add_index, lane)
-            else
-                table.insert(output_lanes_sorted, lane)
-            end
-
-            if lane == balancer.last_success then
-                found_last_success = true
+        -- put items onto the belt
+        local lane_index, _ = next(balancer.output_lanes, balancer.last_success)
+        local previous_success = balancer.last_success
+        while lane_index and #balancer.buffer > 0 do -- we check lane_index first because it is faster
+            local lane = global.lanes[lane_index]
+            lane_index, _ = next(balancer.output_lanes, lane_index)
+            if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
+                table.remove(balancer.buffer, 1)
+                balancer.last_success = lane_index
             end
         end
-
-        -- put items onto the belt
-        local second_iteration = {}
-        for _, lane_index in pairs(output_lanes_sorted) do
-            if #balancer.buffer > 0 then
+        if previous_success then
+            lane_index, _ = next(balancer.output_lanes)
+            while lane_index and lane_index <= previous_success and #balancer.buffer > 0 do
                 local lane = global.lanes[lane_index]
+                lane_index, _ = next(balancer.output_lanes, lane_index)
                 if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
                     table.remove(balancer.buffer, 1)
                     balancer.last_success = lane_index
                 end
-            else
-                break
             end
         end
     end
