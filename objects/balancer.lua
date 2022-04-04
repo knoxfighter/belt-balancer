@@ -179,11 +179,11 @@ end
 
 function balancer_functions.run(balancer_index)
     local balancer = global.balancer[balancer_index]
-
-    if table_size(balancer.input_lanes) > 0 and table_size(balancer.output_lanes) > 0 then
+    local output_lane_count = table_size(balancer.output_lanes)
+    
+    if table_size(balancer.input_lanes) > 0 and output_lane_count > 0 then
         -- get how many items are needed per lane
         local buffer_count = #balancer.buffer
-        local output_lane_count = table_size(balancer.output_lanes)
         local gather_amount = (output_lane_count * 2) - buffer_count
 
         local next_lanes = balancer.input_lanes
