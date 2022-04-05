@@ -51,13 +51,13 @@ function part_functions.get_or_create(entity)
         if input_belt.lanes then
             for _, lane in pairs(input_belt.lanes) do
                 local belt_lane = belt.lanes[lane]
-                balancer.input_lanes[belt_lane] = belt_lane
-                part.input_lanes[belt_lane] = belt_lane
+                balancer.input_lanes[belt_lane] = global.lanes[belt_lane]
+                part.input_lanes[belt_lane] = global.lanes[belt_lane]
             end
         else
             for _, v in pairs(belt.lanes) do
-                balancer.input_lanes[v] = v
-                part.input_lanes[v] = v
+                balancer.input_lanes[v] = global.lanes[v]
+                part.input_lanes[v] = global.lanes[v]
             end
         end
     end
@@ -78,13 +78,13 @@ function part_functions.get_or_create(entity)
         if output_belt.lanes then
             for _, lane in pairs(output_belt.lanes) do
                 local belt_lane = belt.lanes[lane]
-                balancer.output_lanes[belt_lane] = belt_lane
-                part.output_lanes[belt_lane] = belt_lane
+                balancer.output_lanes[belt_lane] = global.lanes[belt_lane]
+                part.output_lanes[belt_lane] = global.lanes[belt_lane]
             end
         else
             for _, lane in pairs(belt.lanes) do
-                balancer.output_lanes[lane] = lane
-                part.output_lanes[lane] = lane
+                balancer.output_lanes[lane] = global.lanes[lane]
+                part.output_lanes[lane] = global.lanes[lane]
             end
         end
     end
@@ -221,7 +221,7 @@ function part_functions.remove(entity, buffer)
 
             -- check if lanes are still in the balancer
             local found_lane = false
-            for _, lane in pairs(balancer.input_lanes) do
+            for lane, _ in pairs(balancer.input_lanes) do
                 if table.contains(belt.lanes, lane) then
                     found_lane = true
                     break
@@ -265,7 +265,7 @@ function part_functions.remove(entity, buffer)
 
             -- check if lanes are still in the balancer
             local found_lane = false
-            for _, lane in pairs(balancer.output_lanes) do
+            for lane, _ in pairs(balancer.output_lanes) do
                 if table.contains(belt.lanes, lane) then
                     found_lane = true
                     break

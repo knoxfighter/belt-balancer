@@ -193,8 +193,7 @@ function balancer_functions.run(balancer_index)
             local current_lanes = next_lanes
             next_lanes = {}
 
-            for k, lane_index in pairs(current_lanes) do
-                local lane = global.lanes[lane_index]
+            for k, lane in pairs(current_lanes) do
                 if #lane > 0 then
                     -- remove item from lane and add to buffer
                     local lua_item = lane[1]
@@ -203,31 +202,29 @@ function balancer_functions.run(balancer_index)
                     table.insert(balancer.buffer, simple_item)
                     gather_amount = gather_amount - 1
 
-                    next_lanes[k] = lane_index
+                    next_lanes[k] = lane
                 end
             end
         end
 
         -- put items onto the belt
-        local lane_index, _ = next(balancer.output_lanes, balancer.last_success)
+        local lane_index, lane = next(balancer.output_lanes, balancer.last_success)
         local previous_success = balancer.last_success
         while lane_index and #balancer.buffer > 0 do -- we check lane_index first because it is faster
-            local lane = global.lanes[lane_index]
-            lane_index, _ = next(balancer.output_lanes, lane_index)
             if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
                 table.remove(balancer.buffer, 1)
                 balancer.last_success = lane_index
             end
+            lane_index, lane = next(balancer.output_lanes, lane_index)
         end
         if previous_success then
-            lane_index, _ = next(balancer.output_lanes)
+            lane_index, lane = next(balancer.output_lanes)
             while lane_index and lane_index <= previous_success and #balancer.buffer > 0 do
-                local lane = global.lanes[lane_index]
-                lane_index, _ = next(balancer.output_lanes, lane_index)
                 if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
                     table.remove(balancer.buffer, 1)
                     balancer.last_success = lane_index
                 end
+                lane_index, lane = next(balancer.output_lanes, lane_index)
             end
         end
     end
@@ -370,11 +367,11 @@ function balancer_functions.new_from_part_list(part_list)
         end
 
         -- add lanes to balancer
-        for _, lane in pairs(part.input_lanes) do
-            balancer.input_lanes[lane] = lane
+        for lane_index, lane in pairs(part.input_lanes) do
+            balancer.input_lanes[lane_index] = lane
         end
-        for _, lane in pairs(part.output_lanes) do
-            balancer.output_lanes[lane] = lane
+        for lane_index, lane in pairs(part.output_lanes) do
+            balancer.output_lanes[lane_index] = lane
         end
     end
 

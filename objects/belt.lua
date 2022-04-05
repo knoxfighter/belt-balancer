@@ -209,9 +209,9 @@ function belt_functions.built_belt(belt)
         local balancer = global.balancer[into_part.balancer]
         for _, lane in pairs(stack_belt.lanes) do
             -- add lanes to balancer
-            balancer.input_lanes[lane] = lane
+            balancer.input_lanes[lane] = global.lanes[lane]
             -- add lanes to part
-            into_part.input_lanes[lane] = lane
+            into_part.input_lanes[lane] = global.lanes[lane]
         end
 
         -- recalculate nth_tick on changed balancer
@@ -230,9 +230,9 @@ function belt_functions.built_belt(belt)
         local balancer = global.balancer[from_part.balancer]
         for _, lane in pairs(stack_belt.lanes) do
             -- add lanes to balancer
-            balancer.output_lanes[lane] = lane
+            balancer.output_lanes[lane] = global.lanes[lane]
             -- add lanes to part
-            from_part.output_lanes[lane] = lane
+            from_part.output_lanes[lane] = global.lanes[lane]
         end
 
         -- recalculate nth_tick on changed balancer
@@ -255,13 +255,13 @@ function belt_functions.built_splitter(splitter_entity)
         into_part.part.input_belts[splitter_entity.unit_number] = splitter_entity.unit_number
 
         local balancer = global.balancer[into_part.part.balancer]
-        for _, lane_i in pairs(into_part.lanes) do
+        for lane_i, _ in pairs(into_part.lanes) do
             local lane = stack_belt.lanes[lane_i]
 
             --add lanes to balancer
-            balancer.input_lanes[lane] = lane
+            balancer.input_lanes[lane] = global.lanes[lane]
             --add lanes to part
-            into_part.part.input_lanes[lane] = lane
+            into_part.part.input_lanes[lane] = global.lanes[lane]
         end
 
         -- recalculate nth_tick on changed balancer
@@ -278,13 +278,13 @@ function belt_functions.built_splitter(splitter_entity)
         from_part.part.output_belts[splitter_entity.unit_number] = splitter_entity.unit_number
 
         local balancer = global.balancer[from_part.part.balancer]
-        for _, lane_i in pairs(from_part.lanes) do
+        for lane_i, _ in pairs(from_part.lanes) do
             local lane = stack_belt.lanes[lane_i]
             --add lanes to balancer
-            balancer.output_lanes[lane] = lane
+            balancer.output_lanes[lane] = global.lanes[lane]
 
             --add lanes to part
-            from_part.part.output_lanes[lane] = lane
+            from_part.part.output_lanes[lane] = global.lanes[lane]
         end
 
         -- recalculate nth_tick on changed balancer
