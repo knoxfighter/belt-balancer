@@ -180,8 +180,9 @@ end
 function balancer_functions.run(balancer_index)
     local balancer = global.balancer[balancer_index]
     local output_lane_count = table_size(balancer.output_lanes)
+    local next_lane_count = table_size(balancer.input_lanes)
     
-    if table_size(balancer.input_lanes) > 0 and output_lane_count > 0 then
+    if next_lane_count > 0 and output_lane_count > 0 then
         -- get how many items are needed per lane
         local buffer_count = #balancer.buffer
         local gather_amount = (output_lane_count * 2) - buffer_count
@@ -189,7 +190,7 @@ function balancer_functions.run(balancer_index)
         local next_lanes = balancer.input_lanes
 
         -- INPUT
-        while gather_amount > 0 and table_size(next_lanes) > 0 do
+        while gather_amount > 0 and next_lane_count > 0 do
             local current_lanes = next_lanes
             next_lanes = {}
 
@@ -205,8 +206,10 @@ function balancer_functions.run(balancer_index)
                     next_lanes[k] = lane
                 end
             end
+            next_lane_count = table_size(next_lanes)
         end
 
+        if table_size(balancer.output_lanes) == 0 then return 1 end
         -- put items onto the belt
         local lane_index, lane = next(balancer.output_lanes, balancer.last_success)
         local previous_success = balancer.last_success

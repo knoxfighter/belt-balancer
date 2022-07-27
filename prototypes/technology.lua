@@ -4,7 +4,7 @@ data:extend {
     {
         type = "technology",
         name = "belt-balancer-1",
-        icon = "__belt-balancer__/graphics/icons/balancer.png",
+        icon = "__belt-balancer-performance__/graphics/icons/balancer.png",
         icon_size = 200,
         effects = {
             {
@@ -22,7 +22,7 @@ data:extend {
     {
         type = "technology",
         name = "belt-balancer-2",
-        icon = "__belt-balancer__/graphics/icons/balancer.png",
+        icon = "__belt-balancer-performance__/graphics/icons/balancer.png",
         icon_size = 200,
         effects = {
             {
@@ -40,7 +40,7 @@ data:extend {
     {
         type = "technology",
         name = "belt-balancer-3",
-        icon = "__belt-balancer__/graphics/icons/balancer.png",
+        icon = "__belt-balancer-performance__/graphics/icons/balancer.png",
         icon_size = 200,
         effects = {
             {
@@ -64,7 +64,7 @@ if mods["boblogistics"] then
             {
                 type = "technology",
                 name = "belt-balancer-0",
-                icon = "__belt-balancer__/graphics/icons/balancer.png",
+                icon = "__belt-balancer-performance__/graphics/icons/balancer.png",
                 icon_size = 200,
                 effects = {
                     {
@@ -87,7 +87,7 @@ if mods["boblogistics"] then
         {
             type = "technology",
             name = "belt-balancer-4",
-            icon = "__belt-balancer__/graphics/icons/balancer.png",
+            icon = "__belt-balancer-performance__/graphics/icons/balancer.png",
             icon_size = 200,
             effects = {
                 {
@@ -105,7 +105,7 @@ if mods["boblogistics"] then
         {
             type = "technology",
             name = "belt-balancer-5",
-            icon = "__belt-balancer__/graphics/icons/balancer.png",
+            icon = "__belt-balancer-performance__/graphics/icons/balancer.png",
             icon_size = 200,
             effects = {
                 {

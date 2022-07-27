@@ -10,7 +10,7 @@ data:extend {
             { "transport-belt", 5 },
         },
         result = "balancer-part",
-        order = "d[balancer]-a[balancer]"
+        order = "g[balancer]-a[balancer]"
     },
     {
         type = "recipe",
@@ -25,7 +25,7 @@ data:extend {
         results = {
             { "balancer-part", 2 }
         },
-        order = "d[balancer]-b[balancer]"
+        order = "g[balancer]-b[balancer]"
     },
     {
         type = "recipe",
@@ -40,7 +40,7 @@ data:extend {
         results = {
             { "balancer-part", 3 }
         },
-        order = "d[balancer]-c[balancer]"
+        order = "g[balancer]-c[balancer]"
     },
 }
 
@@ -59,7 +59,7 @@ if mods["boblogistics"] then
                     { "basic-transport-belt", 10 },
                 },
                 result = "balancer-part",
-                order = "d[balancer]-0a[balancer]"
+                order = "g[balancer]-0a[balancer]"
             },
         }
     end
@@ -78,7 +78,7 @@ if mods["boblogistics"] then
             results = {
                 { "balancer-part", 4 }
             },
-            order = "d[balancer]-d[balancer]"
+            order = "g[balancer]-d[balancer]"
         },
         {
             type = "recipe",
@@ -93,7 +93,7 @@ if mods["boblogistics"] then
             results = {
                 { "balancer-part", 5 }
             },
-            order = "d[balancer]-e[balancer]"
+            order = "g[balancer]-e[balancer]"
         },
     }
 end

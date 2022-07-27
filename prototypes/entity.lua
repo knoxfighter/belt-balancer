@@ -2,7 +2,7 @@ data:extend {
     {
         type = "simple-entity-with-force",
         name = "balancer-part",
-        icon = "__belt-balancer__/graphics/icons/balancer.png",
+        icon = "__belt-balancer-performance__/graphics/icons/balancer.png",
         icon_size = 200,
         flags = { "placeable-neutral", "player-creation" },
         minable = { mining_time = 0.1, result = "balancer-part" },
@@ -19,7 +19,7 @@ data:extend {
         render_layer = "object",
         animations = {
             {
-                filename = "__belt-balancer__/graphics/entities/balancer.png",
+                filename = "__belt-balancer-performance__/graphics/entities/balancer.png",
                 priority = "high",
                 width = 200,
                 height = 200,

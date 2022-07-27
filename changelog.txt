@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.1.2
+Date: 23.07.2022
+  Bugfix:
+    - The game shouldn't crash as often when replacing belts on a balancer
+  Changes:
+    - Recipies now appear later in the list (no change when playing without mods that add logistics items)
+---------------------------------------------------------------------------------------------------
 Version: 3.0.0
 Date: 22.04.2020
   Added:
