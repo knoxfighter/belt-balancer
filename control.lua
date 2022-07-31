@@ -217,7 +217,8 @@ script.on_event({ defines.events.on_player_rotated_entity },
 )
 
 script.on_event(defines.events.on_tick, function()
-    local unit_number, belt = next(global.belts, global.next_belt_check)
+    local unit_number = global.next_belt_check
+    local belt = global.belts[unit_number]
 
     -- check if belt direction got changed
     if belt and belt.entity.valid and belt.direction ~= belt.entity.direction then
@@ -231,5 +232,5 @@ script.on_event(defines.events.on_tick, function()
         end
     end
 
-    global.next_belt_check = unit_number
+    global.next_belt_check, _ = next(global.belts, unit_number)
 end)

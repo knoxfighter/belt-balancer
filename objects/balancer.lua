@@ -209,10 +209,10 @@ function balancer_functions.run(balancer_index)
             next_lane_count = table_size(next_lanes)
         end
 
-        if table_size(balancer.output_lanes) == 0 then return 1 end
+        
         -- put items onto the belt
-        local lane_index, lane = next(balancer.output_lanes, balancer.last_success)
         local previous_success = balancer.last_success
+        local lane_index, lane = next(balancer.output_lanes, previous_success)
         while lane_index and #balancer.buffer > 0 do -- we check lane_index first because it is faster
             if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
                 table.remove(balancer.buffer, 1)

@@ -313,6 +313,11 @@ function belt_functions.remove_belt(entity, direction, unit_number, surface, pos
         global.lanes[lane] = nil
     end
 
+    -- make sure we don't try to next() this belt later
+    if unit_number == global.next_belt_check then
+        global.next_belt_check, _ = next(global.belts, global.next_belt_check)
+    end
+    
     -- remove belt from global stack
     global.belts[unit_number] = nil
 
@@ -373,6 +378,11 @@ function belt_functions.remove_splitter(entity, direction, unit_number, surface,
         global.lanes[lane] = nil
     end
 
+    -- make sure we don't try to next() this belt later
+    if unit_number == global.next_belt_check then
+        global.next_belt_check, _ = next(global.belts, global.next_belt_check)
+    end
+    
     -- remove belt from global stack
     global.belts[unit_number] = nil
 
@@ -424,6 +434,11 @@ function belt_functions.check_track(belt_index)
             global.lanes[lane] = nil
         end
 
+        -- make sure we don't try to next() this belt later
+        if unit_number == global.next_belt_check then
+            global.next_belt_check, _ = next(global.belts, global.next_belt_check)
+        end
+        
         -- remove belt from global stack
         global.belts[belt_index] = nil
 
