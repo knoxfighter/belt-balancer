@@ -343,6 +343,10 @@ function belt_functions.remove_belt(entity, direction, unit_number, surface, pos
 
         local balancer = global.balancer[from_part.balancer]
         for _, lane in pairs(belt.lanes) do
+            -- make sure it doesn't pick this one next
+            if balancer.next_output == lane then 
+                balancer.next_output = next(balancer.output_lanes, balancer.next_output)
+            end
             -- remove lanes from balancer
             balancer.output_lanes[lane] = nil
             -- remove lanes from part
@@ -406,6 +410,10 @@ function belt_functions.remove_splitter(entity, direction, unit_number, surface,
 
         local balancer = global.balancer[part.part.balancer]
         for _, lane in pairs(belt.lanes) do
+            -- make sure it doesn't pick this one next
+            if balancer.next_output == lane then 
+                balancer.next_output = next(balancer.output_lanes, balancer.next_output)
+            end
             -- remove lanes from balancer
             balancer.output_lanes[lane] = nil
             -- remove lanes from part

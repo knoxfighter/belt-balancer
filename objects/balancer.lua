@@ -181,7 +181,7 @@ function balancer_functions.run(balancer_index)
     local balancer = global.balancer[balancer_index]
     local output_lane_count = table_size(balancer.output_lanes)
     local next_lane_count = table_size(balancer.input_lanes)
-    
+
     if next_lane_count > 0 and output_lane_count > 0 then
         -- get how many items are needed per lane
         local buffer_count = #balancer.buffer
@@ -209,24 +209,32 @@ function balancer_functions.run(balancer_index)
             next_lane_count = table_size(next_lanes)
         end
 
-        
+
+        if #balancer.buffer == 0 then return end
         -- put items onto the belt
-        local previous_success = balancer.last_success
-        local lane_index, lane = next(balancer.output_lanes, previous_success)
-        while lane_index and #balancer.buffer > 0 do -- we check lane_index first because it is faster
-            if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
-                table.remove(balancer.buffer, 1)
-                balancer.last_success = lane_index
-            end
+        local starting_index = balancer.next_output
+        local lane_index, lane
+        if not starting_index then -- if we don't have a place to start, then we start at the beginning
+            lane_index, lane = next(balancer.output_lanes)
+        else
+            lane_index = starting_index
+            lane = balancer.output_lanes[starting_index]
+        end
+
+        if lane and lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
+            table.remove(balancer.buffer, 1)
+            lane_index, lane = next(balancer.output_lanes, lane_index)
+            balancer.next_output = lane_index
+        else
             lane_index, lane = next(balancer.output_lanes, lane_index)
         end
-        if previous_success then
-            lane_index, lane = next(balancer.output_lanes)
-            while lane_index and lane_index <= previous_success and #balancer.buffer > 0 do
-                if lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
-                    table.remove(balancer.buffer, 1)
-                    balancer.last_success = lane_index
-                end
+
+        while lane_index ~= starting_index and #balancer.buffer > 0 do -- we check lane_index first because it is faster
+            if lane and lane.can_insert_at_back() and lane.insert_at_back(balancer.buffer[1]) then
+                table.remove(balancer.buffer, 1)
+                lane_index, lane = next(balancer.output_lanes, lane_index)
+                balancer.next_output = lane_index
+            else
                 lane_index, lane = next(balancer.output_lanes, lane_index)
             end
         end

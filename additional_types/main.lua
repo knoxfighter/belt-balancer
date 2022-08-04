@@ -25,9 +25,9 @@ Balancer.buffer = nil
 ---@type uint
 Balancer.nth_tick = nil
 
---- The last successful output-lane.
+--- The next output lane to be checked.
 ---@type uint
-Balancer.last_success = nil
+Balancer.next_output = nil
 
 --------------------------------------------------------------------------------------------------------------
 
