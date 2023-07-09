@@ -117,8 +117,10 @@ function built_entity(e)
 
     if e.entity then
         entity = e.entity
-    else
+    elseif e.created_entity then
         entity = e.created_entity
+    else
+        entity = e.destination -- this is the name of the entity from on_entity_cloned
     end
 
     if entity.name == "balancer-part" then
@@ -146,7 +148,8 @@ script.on_event(
         defines.events.on_built_entity,
         defines.events.on_robot_built_entity,
         defines.events.script_raised_built,
-        defines.events.script_raised_revive
+        defines.events.script_raised_revive,
+        defines.events.on_entity_cloned -- fix compatability with region cloner
     },
     built_entity
 )
