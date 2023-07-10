@@ -46,18 +46,24 @@ commands.add_command("belt-balancer-statistics", "", function(e)
     local balancer_part_amount = table_size(global.parts)
     local balancer_input_belt_amount = 0
     local balancer_output_belt_amount = 0
+    local balancer_input_lane_amount = 0
+    local balancer_output_lane_amount = 0
 
     for _, balancer in pairs(global.balancer) do
         for _, v in pairs(balancer.parts) do
             balancer_input_belt_amount = balancer_input_belt_amount + table_size(global.parts[v].input_belts)
             balancer_output_belt_amount = balancer_output_belt_amount + table_size(global.parts[v].output_belts)
         end
+        balancer_input_lane_amount = balancer_input_lane_amount + table_size(balancer.input_lanes)
+        balancer_output_lane_amount = balancer_output_lane_amount + table_size(balancer.output_lanes)
     end
 
     local output = "balancers: " .. balancer_amount ..
         "\nbalancer-parts: " .. balancer_part_amount ..
         "\nbalancer_input_belts: " .. balancer_input_belt_amount ..
-        "\nbalancer_output_belts: " .. balancer_output_belt_amount
+        "\nbalancer_output_belts: " .. balancer_output_belt_amount ..
+        "\nbalancer_input_lanes: " .. balancer_input_lane_amount ..
+        "\nbalancer_output_lanes: " .. balancer_output_lane_amount
     game.get_player(e.player_index).print(output)
     print(output)
 end)
