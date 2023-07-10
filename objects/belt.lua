@@ -255,8 +255,8 @@ function belt_functions.built_splitter(splitter_entity)
         into_part.part.input_belts[splitter_entity.unit_number] = splitter_entity.unit_number
 
         local balancer = global.balancer[into_part.part.balancer]
-        for lane_i, _ in pairs(into_part.lanes) do
-            local lane = stack_belt.lanes[lane_i]
+        for _, lane_index in pairs(into_part.lanes) do
+            local lane = stack_belt.lanes[lane_index]
 
             --add lanes to balancer
             balancer.input_lanes[lane] = global.lanes[lane]
@@ -278,8 +278,8 @@ function belt_functions.built_splitter(splitter_entity)
         from_part.part.output_belts[splitter_entity.unit_number] = splitter_entity.unit_number
 
         local balancer = global.balancer[from_part.part.balancer]
-        for lane_i, _ in pairs(from_part.lanes) do
-            local lane = stack_belt.lanes[lane_i]
+        for _, lane_index in pairs(from_part.lanes) do
+            local lane = stack_belt.lanes[lane_index]
             --add lanes to balancer
             balancer.output_lanes[lane] = global.lanes[lane]
 
