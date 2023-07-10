@@ -1,4 +1,12 @@
 ---------------------------------------------------------------------------------------------------
+Version: 3.2.0
+Date: 10.07.2023
+  Bugfix:
+    - Fixed compatability with region cloner (and cloning belt balancers generally) - note that the contents of the belt balancer are not copied
+    - Fixed bug with splitters placed after a splitter not having their lanes added correctly
+  Changes:
+    - Added lane statistics to the command (pulled from the balancers rather than belts as that was what I was debugging)
+---------------------------------------------------------------------------------------------------
 Version: 3.1.3
 Date: 04.08.2022
   Bugfix:
